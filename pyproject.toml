@@ -140,7 +140,6 @@ modern-asr = "modern_asr.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/your-org/modern-asr"
-Documentation = "https://modern-asr.readthedocs.io"
 Repository = "https://github.com/your-org/modern-asr"
 Issues = "https://github.com/your-org/modern-asr/issues"
 

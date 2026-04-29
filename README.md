@@ -70,8 +70,6 @@ Full documentation with Material for MkDocs:
 mkdocs serve
 ```
 
-Or visit: [https://modern-asr.readthedocs.io](https://modern-asr.readthedocs.io)
-
 ---
 
 ## 🏗️ Architecture

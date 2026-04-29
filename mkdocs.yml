@@ -1,6 +1,5 @@
 site_name: Modern ASR
 site_description: "A unified, extensible Python toolkit for LLM-based Automatic Speech Recognition"
-site_url: "https://modern-asr.readthedocs.io"
 repo_name: modern-asr
 repo_url: https://github.com/your-org/modern-asr
 copyright: Copyright &copy; 2025 Modern ASR Contributors
