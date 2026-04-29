@@ -1,0 +1,170 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "modern-asr"
+version = "0.1.0"
+description = "A unified, extensible, and modern Python toolkit for LLM-based Automatic Speech Recognition (ASR)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Modern ASR Contributors" },
+]
+keywords = [
+    "asr", "speech-recognition", "llm", "audio", "whisper",
+    "fireredasr", "sensevoice", "qwen-asr", "mimo-asr",
+    "canary-qwen", "glm-asr", "moonshine", "funasr",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "typing-extensions>=4.8.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+# Core inference backends
+transformers = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "transformers>=4.40.0",
+    "accelerate>=0.25.0",
+]
+vllm = [
+    "vllm>=0.5.0",
+    "torch>=2.0",
+]
+onnx = [
+    "onnxruntime>=1.17.0",
+    "onnxruntime-gpu>=1.17.0; sys_platform != 'darwin'",
+]
+
+# Model-specific dependencies (optional, user picks what they need)
+fireredasr = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "transformers>=4.40.0",
+    "sentencepiece>=0.2.0",
+    "kaldi-native-fbank>=1.15",
+    "kaldiio>=2.18.0",
+    "cn2an>=0.5.23",
+    "peft>=0.13.2",
+    "soundfile>=0.12.0",
+]
+sensevoice = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "funasr>=1.1.0",
+    "modelscope>=1.15.0",
+]
+funasr = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "funasr>=1.1.0",
+    "modelscope>=1.15.0",
+]
+qwen-asr = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "transformers>=4.40.0",
+    "qwen-asr @ git+https://github.com/QwenLM/Qwen3-ASR.git",
+]
+mimo-asr = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "transformers>=4.40.0",
+]
+canary = [
+    "nemo-toolkit[asr]>=2.0",
+    "torch>=2.0",
+]
+glm-asr = [
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "transformers>=4.40.0",
+    "sentencepiece>=0.2.0",
+]
+whisper = [
+    "openai-whisper>=20231117",
+    "torch>=2.0",
+]
+moonshine = [
+    "moonshine>=0.1.0; extra == 'moonshine'",  # placeholder
+    "torch>=2.0",
+    "onnxruntime>=1.17.0",
+]
+
+# Convenience bundles
+all-models = [
+    "modern-asr[fireredasr,sensevoice,funasr,qwen-asr,mimo-asr,canary,glm-asr,whisper,moonshine]",
+]
+all-backends = [
+    "modern-asr[transformers,vllm,onnx]",
+]
+all = [
+    "modern-asr[all-models,all-backends]",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
+]
+docs = [
+    "mkdocs-material>=9.5.0",
+    "mkdocs-minify-plugin>=0.8.0",
+]
+
+[project.scripts]
+masr = "modern_asr.cli:main"
+modern-asr = "modern_asr.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/modern-asr"
+Documentation = "https://modern-asr.readthedocs.io"
+Repository = "https://github.com/your-org/modern-asr"
+Issues = "https://github.com/your-org/modern-asr/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/modern_asr"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "integration: tests that load real model weights",
+    "slow: tests that take significant time to run",
+]

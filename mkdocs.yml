@@ -1,0 +1,94 @@
+site_name: Modern ASR
+site_description: "A unified, extensible Python toolkit for LLM-based Automatic Speech Recognition"
+site_url: "https://modern-asr.readthedocs.io"
+repo_name: modern-asr
+repo_url: https://github.com/your-org/modern-asr
+copyright: Copyright &copy; 2025 Modern ASR Contributors
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-org/modern-asr
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.mark
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: installation.md
+    - Quick Start: getting-started.md
+  - Architecture: architecture.md
+  - API Reference:
+    - ASRPipeline: api/pipeline.md
+    - ASRModel (Base): api/base.md
+    - AudioLLMModel: api/audio-llm.md
+  - Models:
+    - Overview: models/index.md
+    - Whisper: models/whisper.md
+    - SenseVoice: models/sensevoice.md
+    - FireRedASR: models/fireredasr.md
+    - Qwen3-ASR: models/qwen-asr.md
+    - Qwen2.5-Omni: models/qwen-omni.md
+    - Fun-ASR-Nano: models/funasr-nano.md
+    - Paraformer: models/paraformer.md
+    - MiMo-V2.5-ASR: models/mimo-asr.md
+    - GLM-ASR: models/glm-asr.md
+    - Canary-Qwen: models/canary-qwen.md
+    - Granite-Speech: models/granite-speech.md
+    - LLaMA-Omni: models/llama-omni.md
+    - MiDashengLM: models/midasheng.md
+    - Moonshine: models/moonshine.md
+  - Contributing: contributing.md

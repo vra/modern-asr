@@ -1,0 +1,37 @@
+# Example Modern ASR pipeline configuration
+default_backend:
+  name: transformers
+  device: auto
+  dtype: float16
+  batch_size: 1
+
+models:
+  # Production-ready Chinese ASR
+  chinese-fast:
+    model_id: sensevoice-small
+    language: auto
+    return_timestamps: false
+
+  # High-accuracy Chinese ASR
+  chinese-accurate:
+    model_id: fireredasr-llm
+    language: zh
+    backend:
+      name: transformers
+      device: cuda:0
+      dtype: float16
+
+  # Multilingual fallback
+  multilingual:
+    model_id: whisper-large-v3
+    language: auto
+    return_word_timestamps: true
+
+  # Edge deployment
+  edge:
+    model_id: moonshine-tiny
+    language: en
+    backend:
+      name: onnx
+      device: cpu
+      dtype: float32
