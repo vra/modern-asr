@@ -41,13 +41,13 @@ dependencies = [
 [project.optional-dependencies]
 # Core inference backends
 transformers = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
     "accelerate>=0.25.0",
 ]
 vllm = [
-    "vllm>=0.5.0",
+    "vllm>=0.5.5",
     "torch>=2.0",
 ]
 onnx = [
@@ -57,8 +57,8 @@ onnx = [
 
 # Model-specific dependencies (optional, user picks what they need)
 fireredasr = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
     "sentencepiece>=0.2.0",
     "kaldi-native-fbank>=1.15",
@@ -68,35 +68,35 @@ fireredasr = [
     "soundfile>=0.12.0",
 ]
 sensevoice = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "funasr>=1.1.0",
     "modelscope>=1.15.0",
 ]
 funasr = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "funasr>=1.1.0",
     "modelscope>=1.15.0",
 ]
 qwen-asr = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
     "qwen-asr @ git+https://github.com/QwenLM/Qwen3-ASR.git",
 ]
 mimo-asr = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
 ]
 canary = [
-    "nemo-toolkit[asr]>=2.0",
-    "torch>=2.0",
+    # "nemo-toolkit[asr]>=2.0",
+    "torch>=2.0,<2.5",
 ]
 glm-asr = [
-    "torch>=2.0",
-    "torchaudio>=2.0",
+    "torch>=2.0,<2.5",
+    "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
     "sentencepiece>=0.2.0",
 ]
@@ -105,7 +105,6 @@ whisper = [
     "torch>=2.0",
 ]
 moonshine = [
-    "moonshine>=0.1.0; extra == 'moonshine'",  # placeholder
     "torch>=2.0",
     "onnxruntime>=1.17.0",
 ]
@@ -121,7 +120,8 @@ all = [
     "modern-asr[all-models,all-backends]",
 ]
 
-# Development dependencies
+# Development dependencies (managed via uv sync --dev / --group docs)
+[dependency-groups]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23.0",
@@ -143,6 +143,12 @@ Homepage = "https://github.com/your-org/modern-asr"
 Documentation = "https://modern-asr.readthedocs.io"
 Repository = "https://github.com/your-org/modern-asr"
 Issues = "https://github.com/your-org/modern-asr/issues"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/modern_asr"]

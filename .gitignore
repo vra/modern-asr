@@ -21,8 +21,7 @@ wheels/
 *.egg
 
 # uv
-.venv/
-uv.lock
+.venv
 
 # IDE
 .vscode/
