@@ -56,7 +56,7 @@ class Qwen25Omni7B(AudioLLMModel):
         except ImportError as exc:
             raise RuntimeError(
                 f"Qwen2.5-Omni requires a newer version of transformers. "
-                f"Please upgrade: uv pip install 'transformers>=4.50'. "
+                f"Please upgrade: uv sync --extra transformers. "
                 f"Original error: {exc}"
             ) from exc
 

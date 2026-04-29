@@ -24,7 +24,7 @@ class ONNXBackend(InferenceBackend):
         except ImportError as exc:
             raise ImportError(
                 "ONNX Runtime is required for ONNXBackend. "
-                "Install with: uv pip install onnxruntime"
+                "Install with: uv sync --extra onnx"
             ) from exc
 
         providers = kwargs.pop("providers", None)

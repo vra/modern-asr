@@ -31,7 +31,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "Granite Speech requires 'torch' and 'transformers'. "
-            "Install with: uv pip install modern-asr[all]"
+            "Install with: uv sync --all-extras"
         ) from exc
 
 

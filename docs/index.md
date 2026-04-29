@@ -26,12 +26,10 @@ Every model runs **locally on your hardware**. No cloud APIs, no data leaves you
 ## Quick Start
 
 ```bash
-# Create a Python 3.12 environment (recommended for latest models)
-uv venv --python python3.12 .venv
-source .venv/bin/activate
-
-# Install with the models you need
-uv pip install "modern-asr[sensevoice,whisper,qwen-asr]"
+# Clone and sync with the models you need
+git clone https://github.com/vra/modern-asr.git
+cd modern-asr
+uv sync --extra sensevoice --extra whisper --extra qwen-asr
 ```
 
 ```python

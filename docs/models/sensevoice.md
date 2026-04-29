@@ -16,7 +16,7 @@ SenseVoice is Alibaba's production-grade ASR system with strong Chinese support,
 ## Installation
 
 ```bash
-uv pip install "modern-asr[sensevoice]"
+uv sync --extra sensevoice
 ```
 
 Or manually:

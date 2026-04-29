@@ -25,7 +25,7 @@ Unlike most models in Modern ASR, Qwen3-ASR is distributed via a **dedicated Pyt
 pip install git+https://github.com/QwenLM/Qwen3-ASR.git
 
 # Or via Modern ASR extras
-uv pip install "modern-asr[qwen-asr]"
+uv sync --extra qwen-asr
 ```
 
 ---

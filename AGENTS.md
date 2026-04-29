@@ -91,5 +91,5 @@ PYTHONPATH=src pytest tests/ -v
 ## Build / Package
 
 ```bash
-uv pip install -e ".[dev]"
+uv sync --all-extras
 ```

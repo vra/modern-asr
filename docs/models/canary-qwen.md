@@ -15,7 +15,7 @@ Canary-Qwen is NVIDIA's multilingual ASR model, optimized for production deploym
 ## Installation
 
 ```bash
-uv pip install "modern-asr[canary]"
+uv sync --extra canary
 ```
 
 Or manually:

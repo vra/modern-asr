@@ -15,7 +15,7 @@ Moonshine is Useful Sensors' ultra-lightweight ASR model, designed for **edge de
 ## Installation
 
 ```bash
-uv pip install "modern-asr[moonshine]"
+uv sync --extra moonshine
 ```
 
 Or manually:

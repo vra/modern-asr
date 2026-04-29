@@ -20,7 +20,9 @@ Modern ASR uses **optional dependency groups** so you only install what you need
 ## Core Installation
 
 ```bash
-uv pip install modern-asr
+git clone https://github.com/vra/modern-asr.git
+cd modern-asr
+uv sync
 ```
 
 This installs only the core framework. You will need to add extras for actual model inference.
@@ -31,42 +33,42 @@ This installs only the core framework. You will need to add extras for actual mo
 
 ### Whisper (OpenAI)
 ```bash
-uv pip install "modern-asr[whisper]"
+uv sync --extra whisper
 ```
 
 ### SenseVoice & Paraformer (Alibaba)
 ```bash
-uv pip install "modern-asr[sensevoice]"
+uv sync --extra sensevoice
 ```
 
 ### FireRedASR (Xiaohongshu)
 ```bash
-uv pip install "modern-asr[fireredasr]"
+uv sync --extra fireredasr
 ```
 
 ### Qwen3-ASR (Alibaba)
 ```bash
-uv pip install "modern-asr[qwen-asr]"
+uv sync --extra qwen-asr
 ```
 
 ### MiMo-V2.5-ASR (Xiaomi)
 ```bash
-uv pip install "modern-asr[mimo-asr]"
+uv sync --extra mimo-asr
 ```
 
 ### GLM-ASR (Zhipu AI)
 ```bash
-uv pip install "modern-asr[glm-asr]"
+uv sync --extra glm-asr
 ```
 
 ### Canary-Qwen (NVIDIA)
 ```bash
-uv pip install "modern-asr[canary]"
+uv sync --extra canary
 ```
 
 ### Moonshine (Useful Sensors)
 ```bash
-uv pip install "modern-asr[moonshine]"
+uv sync --extra moonshine
 ```
 
 ---
@@ -75,7 +77,7 @@ uv pip install "modern-asr[moonshine]"
 
 ```bash
 # All models + all inference backends
-uv pip install "modern-asr[all]"
+uv sync --all-extras
 ```
 
 ---
@@ -120,11 +122,9 @@ cd /tmp/FireRedASR && pip install -e .
 ## Development Setup
 
 ```bash
-git clone https://github.com/your-org/modern-asr.git
+git clone https://github.com/vra/modern-asr.git
 cd modern-asr
-uv venv --python python3.12 .venv
-source .venv/bin/activate
-uv pip install -e ".[all,dev]"
+uv sync --all-extras
 ```
 
 Run tests:

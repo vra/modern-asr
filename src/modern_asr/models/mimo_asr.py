@@ -65,7 +65,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "MiMo-ASR requires 'torch' and 'transformers'. "
-            "Install with: uv pip install modern-asr[mimo-asr]"
+            "Install with: uv sync --extra mimo-asr"
         ) from exc
 
 

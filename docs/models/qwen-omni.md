@@ -15,7 +15,7 @@ Qwen2.5-Omni is Alibaba's fully multimodal model capable of **audio understandin
 ## Installation
 
 ```bash
-uv pip install "modern-asr[qwen-asr]"
+uv sync --extra qwen-asr
 ```
 
 Requires `transformers >= 4.50` for `Qwen2_5OmniModel` and `Qwen2_5OmniProcessor` support.

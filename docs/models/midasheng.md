@@ -15,7 +15,7 @@ MiDashengLM is Xiaomi's general audio understanding model, capable of ASR plus b
 ## Installation
 
 ```bash
-uv pip install "modern-asr[transformers]"
+uv sync --extra transformers
 ```
 
 ---

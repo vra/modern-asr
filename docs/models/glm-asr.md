@@ -15,7 +15,7 @@ GLM-ASR is Zhipu AI's open-source Audio-LLM ASR model, built on the GLM architec
 ## Installation
 
 ```bash
-uv pip install "modern-asr[glm-asr]"
+uv sync --extra glm-asr
 ```
 
 Or manually:

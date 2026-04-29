@@ -38,7 +38,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "Fun-ASR requires 'torch' and 'funasr'. "
-            "Install with: uv pip install modern-asr[funasr]"
+            "Install with: uv sync --extra funasr"
         ) from exc
 
 

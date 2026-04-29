@@ -48,7 +48,7 @@ huggingface-cli download XiaomiMiMo/MiMo-Audio-Tokenizer \
 ### Step 3: Install Modern ASR
 
 ```bash
-uv pip install "modern-asr[mimo-asr]"
+uv sync --extra mimo-asr
 ```
 
 ---

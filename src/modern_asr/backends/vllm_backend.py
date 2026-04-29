@@ -26,7 +26,7 @@ class VLLMBackend(InferenceBackend):
             from vllm import LLM
         except ImportError as exc:
             raise ImportError(
-                "vLLM is required for VLLMBackend. Install with: uv pip install vllm"
+                "vLLM is required for VLLMBackend. Install with: uv sync --extra vllm"
             ) from exc
 
         dtype_map = {

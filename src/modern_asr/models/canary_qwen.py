@@ -30,7 +30,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "Canary-Qwen requires NVIDIA NeMo. "
-            "Install with: uv pip install nemo-toolkit[asr]"
+            "Install with: uv sync --extra canary"
         ) from exc
 
 

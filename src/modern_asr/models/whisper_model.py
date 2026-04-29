@@ -28,7 +28,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "Whisper requires 'openai-whisper' and 'torch'. "
-            "Install with: uv pip install modern-asr[whisper]"
+            "Install with: uv sync --extra whisper"
         ) from exc
 
 

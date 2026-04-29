@@ -15,7 +15,7 @@ LLaMA-Omni is a speech-to-text conversation model based on LLaMA, capable of und
 ## Installation
 
 ```bash
-uv pip install "modern-asr[transformers]"
+uv sync --extra transformers
 ```
 
 ---

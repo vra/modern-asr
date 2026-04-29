@@ -15,7 +15,7 @@ Granite-Speech is IBM's enterprise-grade multilingual speech model, part of the 
 ## Installation
 
 ```bash
-uv pip install "modern-asr[transformers]"
+uv sync --extra transformers
 ```
 
 ---

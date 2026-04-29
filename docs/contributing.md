@@ -7,11 +7,14 @@ Thank you for your interest in Modern ASR! This project welcomes contributions o
 ## Development Setup
 
 ```bash
-git clone https://github.com/your-org/modern-asr.git
+git clone https://github.com/vra/modern-asr.git
 cd modern-asr
-uv venv --python python3.12 .venv
-source .venv/bin/activate
-uv pip install -e ".[all,dev]"
+
+# Create virtual environment and sync all dependencies
+uv sync --all-extras
+
+# The dev dependency group (pytest, ruff, mypy, pre-commit)
+# is included by default via [tool.uv.default-groups].
 ```
 
 ---

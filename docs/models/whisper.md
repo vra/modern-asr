@@ -20,7 +20,7 @@ OpenAI's Whisper is the foundational open-source ASR model. Modern ASR wraps all
 ## Installation
 
 ```bash
-uv pip install "modern-asr[whisper]"
+uv sync --extra whisper
 ```
 
 Or manually:

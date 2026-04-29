@@ -34,7 +34,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "SenseVoice requires 'torch' and 'funasr'. "
-            "Install with: uv pip install modern-asr[sensevoice]"
+            "Install with: uv sync --extra sensevoice"
         ) from exc
 
 

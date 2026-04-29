@@ -22,14 +22,18 @@ A **unified, extensible, and future-proof** Python toolkit for locally running s
 ## 📦 Installation
 
 ```bash
-# Using uv (recommended)
-uv pip install modern-asr
+# Clone the repository
+git clone https://github.com/vra/modern-asr.git
+cd modern-asr
 
-# With specific model support
-uv pip install "modern-asr[sensevoice,fireredasr,whisper]"
+# Sync dependencies (recommended)
+uv sync --all-extras
 
-# All models + all backends
-uv pip install "modern-asr[all]"
+# Or install specific extras only
+uv sync --extra transformers --extra whisper
+
+# Or just core dependencies
+uv sync
 ```
 
 **Python 3.10+ recommended.** Some models (Qwen3-ASR, MiMo) require Python ≥ 3.10.

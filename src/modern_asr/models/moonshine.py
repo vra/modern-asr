@@ -27,7 +27,7 @@ def _check_deps() -> None:
     except ImportError as exc:
         raise ImportError(
             "Moonshine requires 'onnxruntime'. "
-            "Install with: uv pip install modern-asr[moonshine]"
+            "Install with: uv sync --extra moonshine"
         ) from exc
 
 

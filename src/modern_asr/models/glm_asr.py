@@ -50,6 +50,6 @@ class GLMASRNano2512(AudioLLMModel):
         except (ValueError, ImportError) as exc:
             raise RuntimeError(
                 f"GLM-ASR requires a newer version of transformers. "
-                f"Please upgrade: uv pip install 'transformers>=4.50'. "
+                f"Please upgrade: uv sync --extra transformers. "
                 f"Original error: {exc}"
             ) from exc

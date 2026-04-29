@@ -27,7 +27,7 @@ cd /tmp/FireRedASR && pip install -e .
 ### 2. Install Modern ASR extras
 
 ```bash
-uv pip install "modern-asr[fireredasr]"
+uv sync --extra fireredasr
 ```
 
 ---

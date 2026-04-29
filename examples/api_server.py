@@ -1,7 +1,7 @@
 """Example FastAPI server for Modern ASR.
 
 Run:
-    uv pip install fastapi uvicorn
+    uv add fastapi uvicorn
     uvicorn examples.api_server:app --reload
 
 Endpoints:
