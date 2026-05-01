@@ -67,7 +67,7 @@ class TransformersBackend(InferenceBackend):
         import torch
         if self.dtype in ("auto", "float16"):
             return torch.float16
-        if self.dtype == "bfloat16" and torch.cuda.is_available():
+        if self.dtype == "bfloat16" and (torch.cuda.is_available() or torch.backends.mps.is_available()):
             return torch.bfloat16
         if self.dtype == "float32":
             return torch.float32
@@ -76,7 +76,11 @@ class TransformersBackend(InferenceBackend):
     def _resolve_device(self) -> str:
         import torch
         if self.device == "auto":
-            return "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                return "cuda"
+            if torch.backends.mps.is_available():
+                return "mps"
+            return "cpu"
         return self.device
 
     def unload(self) -> None:

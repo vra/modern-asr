@@ -160,13 +160,17 @@ class ASRModel(ABC):
 
         Args:
             device: Override device. If ``None``, uses ``self.backend.device``
-                or falls back to ``"cuda"`` if available.
+                or falls back to auto-detection (cuda > mps > cpu).
         """
         import torch
 
         d = device or (self.backend.device if self.backend else "auto")
         if d == "auto":
-            return "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                return "cuda"
+            if torch.backends.mps.is_available():
+                return "mps"
+            return "cpu"
         return d
 
     def _resolve_dtype(self, dtype: str | None = None) -> Any:
@@ -181,7 +185,7 @@ class ASRModel(ABC):
         dt = dtype or (self.backend.dtype if self.backend else "auto")
         if dt in ("auto", "float16"):
             return torch.float16
-        if dt == "bfloat16" and torch.cuda.is_available():
+        if dt == "bfloat16" and (torch.cuda.is_available() or torch.backends.mps.is_available()):
             return torch.bfloat16
         if dt == "float32":
             return torch.float32

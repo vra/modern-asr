@@ -15,6 +15,7 @@ A **unified, extensible, and future-proof** Python toolkit for locally running s
 - 🌍 **Multi-Language** — 52 languages, 22 Chinese dialects
 - 🎯 **Multi-Task** — Transcription, translation, diarization, emotion, events
 - 💻 **Local-First** — All inference on-device. No APIs. No data leaves your machine.
+- 🍎 **Apple Silicon** — MPS (Metal Performance Shaders) support on macOS
 - 🐍 **Modern Python** — uv-native packaging, Pydantic configs, rich CLI
 
 ---

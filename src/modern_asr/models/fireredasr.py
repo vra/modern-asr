@@ -88,7 +88,7 @@ class _FireRedASRBase(ASRModel):
         texts = []
         for idx, chunk_path in enumerate(chunks):
             decode_cfg = {
-                "use_gpu": 1 if self._resolve_device() == "cuda" else 0,
+                "use_gpu": 1 if self._resolve_device() in ("cuda", "mps") else 0,
                 "beam_size": kwargs.get("beam_size", self.config.beam_size or 3),
                 "nbest": 1,
                 "decode_max_len": 0,
@@ -158,7 +158,11 @@ class _FireRedASRBase(ASRModel):
         import torch
         if self.backend and self.backend.device != "auto":
             return self.backend.device
-        return "cuda" if torch.cuda.is_available() else "cpu"
+        if torch.cuda.is_available():
+            return "cuda"
+        if torch.backends.mps.is_available():
+            return "mps"
+        return "cpu"
 
 
 @register_model("fireredasr-llm")

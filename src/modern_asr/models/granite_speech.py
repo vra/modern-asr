@@ -126,7 +126,7 @@ class GraniteSpeech33_8B(ASRModel):
         import torch
         if dtype in ("auto", "float16"):
             return torch.float16
-        if dtype == "bfloat16" and torch.cuda.is_available():
+        if dtype == "bfloat16" and (torch.cuda.is_available() or torch.backends.mps.is_available()):
             return torch.bfloat16
         if dtype == "float32":
             return torch.float32
@@ -135,5 +135,9 @@ class GraniteSpeech33_8B(ASRModel):
     def _resolve_device(self, device: str) -> str:
         import torch
         if device == "auto":
-            return "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                return "cuda"
+            if torch.backends.mps.is_available():
+                return "mps"
+            return "cpu"
         return device

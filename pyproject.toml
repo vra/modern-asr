@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modern-asr"
-version = "0.1.1"
+version = "0.1.4"
 description = "A unified, extensible, and modern Python toolkit for LLM-based Automatic Speech Recognition (ASR)."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -27,6 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
 ]
@@ -41,8 +42,8 @@ dependencies = [
 [project.optional-dependencies]
 # Core inference backends
 transformers = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "transformers>=4.40.0",
     "accelerate>=0.25.0",
 ]
@@ -57,8 +58,8 @@ onnx = [
 
 # Model-specific dependencies (optional, user picks what they need)
 fireredasr = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "transformers>=4.40.0",
     "sentencepiece>=0.2.0",
     "kaldi-native-fbank>=1.15",
@@ -68,35 +69,35 @@ fireredasr = [
     "soundfile>=0.12.0",
 ]
 sensevoice = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "funasr>=1.1.0",
     "modelscope>=1.15.0",
 ]
 funasr = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "funasr>=1.1.0",
     "modelscope>=1.15.0",
 ]
 qwen-asr = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "transformers>=4.40.0",
     "qwen-asr>=0.0.6",
 ]
 mimo-asr = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "transformers>=4.40.0",
 ]
 canary = [
     # "nemo-toolkit[asr]>=2.0",
-    "torch>=2.0,<2.5",
+    "torch>=2.0",
 ]
 glm-asr = [
-    "torch>=2.0,<2.5",
-    "torchaudio>=2.0,<2.5",
+    "torch>=2.0",
+    "torchaudio>=2.0",
     "transformers>=4.40.0",
     "sentencepiece>=0.2.0",
 ]
@@ -153,6 +154,8 @@ allow-direct-references = true
 exclude = [
     "/.venv",
     "/.venv312",
+    "/.venv_py313",
+    "/.venv_py314",
     "/.pytest_cache",
     "/.github",
     "/tests",

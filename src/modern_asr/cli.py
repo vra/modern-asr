@@ -279,7 +279,7 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("-l", "--language", default="auto", help="Language code")
     run_parser.add_argument("-o", "--output", default=None, help="Output file path")
     run_parser.add_argument("-f", "--format", default=None, choices=["txt", "json", "srt", "vtt"], help="Output format (inferred from --output suffix if omitted)")
-    run_parser.add_argument("--device", default="auto", help="Device: auto, cuda, cpu")
+    run_parser.add_argument("--device", default="auto", help="Device: auto, cuda, mps, cpu")
     run_parser.add_argument("--dtype", default="auto", help="Dtype: auto, float16, bfloat16, float32")
     run_parser.set_defaults(func=_run)
 
