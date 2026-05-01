@@ -7,6 +7,11 @@ from typing import Any
 from modern_asr.backends.base import InferenceBackend
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 class ONNXBackend(InferenceBackend):
     """Backend powered by ONNX Runtime.
 

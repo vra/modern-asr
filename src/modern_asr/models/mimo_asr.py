@@ -143,6 +143,11 @@ class MiMoASRV25(AudioLLMModel):
     # ------------------------------------------------------------------ #
 
     def load(self) -> None:
+        from modern_asr.utils.log import get_logger
+
+        logger = get_logger(__name__)
+        logger.info("Loading %s", self.model_id)
+
         _check_deps()
 
         from modern_asr.utils.auto_install import ensure_git, ensure_hf
@@ -162,6 +167,7 @@ class MiMoASRV25(AudioLLMModel):
 
         self._model = MimoAudio(str(model_dir), str(tokenizer_dir))
         self._is_loaded = True
+        logger.info("%s ready", self.model_id)
 
     # ------------------------------------------------------------------ #
     # Inference

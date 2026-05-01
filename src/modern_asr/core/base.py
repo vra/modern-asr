@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gc
+import logging
 import os
 import tempfile
 from abc import ABC, abstractmethod
@@ -10,6 +11,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+from modern_asr.utils.log import get_logger
 
 if TYPE_CHECKING:
     from modern_asr.core.config import BackendConfig, ModelConfig
@@ -135,6 +138,7 @@ class ASRModel(ABC):
 
     def unload(self) -> None:
         """Release model weights from memory."""
+        get_logger(__name__).info("Unloading %s", self.model_id)
         self._model = None
         self._processor = None
         self._is_loaded = False

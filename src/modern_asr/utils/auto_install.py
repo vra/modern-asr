@@ -10,8 +10,11 @@ import importlib
 import os
 import subprocess
 import sys
-import warnings
 from pathlib import Path
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
 
 _CACHE_ROOT = Path.home() / ".cache" / "modern-asr"
 
@@ -41,7 +44,7 @@ def ensure_pypi(pkg_spec: str, import_name: str | None = None) -> None:
     try:
         importlib.import_module(import_name)
     except ImportError:
-        warnings.warn(f"[modern-asr] Auto-installing {pkg_spec} ...", stacklevel=2)
+        logger.info("Auto-installing %s ...", pkg_spec)
         _run([sys.executable, "-m", "pip", "install", pkg_spec])
 
 
@@ -55,7 +58,7 @@ def ensure_git(url: str, name: str | None = None) -> Path:
     dest = _CACHE_ROOT / "repos" / name
     if not dest.exists():
         dest.parent.mkdir(parents=True, exist_ok=True)
-        warnings.warn(f"[modern-asr] Auto-cloning {url} ...", stacklevel=2)
+        logger.info("Auto-cloning %s ...", url)
         _run(["git", "clone", "--depth", "1", url, str(dest)])
     return dest
 
@@ -73,7 +76,7 @@ def ensure_hf(repo_id: str, name: str | None = None) -> Path:
     dest = _CACHE_ROOT / "models" / name
     if not dest.exists() or not any(dest.iterdir()):
         dest.parent.mkdir(parents=True, exist_ok=True)
-        warnings.warn(f"[modern-asr] Auto-downloading {repo_id} ...", stacklevel=2)
+        logger.info("Auto-downloading %s ...", repo_id)
         token = os.environ.get("HF_TOKEN")
         kwargs: dict[str, object] = {"local_dir": str(dest)}
         if token:

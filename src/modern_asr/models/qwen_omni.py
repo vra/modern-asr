@@ -24,6 +24,11 @@ from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 @register_model("qwen2.5-omni-7b")
 class Qwen25Omni7B(AudioLLMModel):
     """Qwen2.5-Omni-7B: Fully multimodal model with strong ASR capabilities."""
@@ -51,6 +56,8 @@ class Qwen25Omni7B(AudioLLMModel):
 
     def load(self) -> None:
         """Load with descriptive error if transformers is too old."""
+        logger.info("Loading %s", self.model_id)
+
         try:
             super().load()
         except ImportError as exc:
@@ -72,5 +79,7 @@ class Qwen25Omni7B(AudioLLMModel):
 
     def transcribe(self, audio: Any, **kwargs: Any) -> ASRResult:
         """Override to handle Qwen2.5-Omni's special input format."""
+        logger.info("Transcribing with %s", self.model_id)
+
         self._ensure_loaded()
         return self._transcribe_single(audio, **kwargs)

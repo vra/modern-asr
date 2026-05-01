@@ -9,6 +9,11 @@ from typing import TYPE_CHECKING, Callable, TypeVar
 
 from modern_asr.core.base import ASRModel
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 if TYPE_CHECKING:
     from modern_asr.core.config import BackendConfig, ModelConfig
 

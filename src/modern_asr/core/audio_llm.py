@@ -119,6 +119,11 @@ class AudioLLMModel(ASRModel):
 
     def load(self) -> None:
         """Load processor and model using the configured class paths."""
+        from modern_asr.utils.log import get_logger
+
+        logger = get_logger(__name__)
+        logger.info("Loading %s from %s", self.model_id, self._hf_path)
+
         self._auto_install_requirements()
         device = self._resolve_device()
         dtype = self._resolve_dtype()
@@ -144,6 +149,7 @@ class AudioLLMModel(ASRModel):
 
         self._model = model_cls.from_pretrained(self._hf_path, **load_kwargs)
         self._is_loaded = True
+        logger.info("%s loaded on %s (dtype=%s)", self.model_id, device, dtype)
 
     # --- Inference ------------------------------------------------------
 

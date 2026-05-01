@@ -12,6 +12,9 @@ from modern_asr.core.config import BackendConfig, ModelConfig, PipelineConfig
 from modern_asr.core.registry import create_model, get_model_class
 from modern_asr.core.types import ASRResult, AudioInput
 from modern_asr.utils.audio import load_audio
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
 
 
 class ASRPipeline:
@@ -53,6 +56,7 @@ class ASRPipeline:
             self._init_model(model_id)
 
     def _init_model(self, model_id: str) -> None:
+        logger.info("Initialising pipeline with model: %s", model_id)
         if self._pipeline_config and model_id in self._pipeline_config.models:
             cfg = self._pipeline_config.models[model_id]
         else:
@@ -61,6 +65,7 @@ class ASRPipeline:
         backend = cfg.backend or self._backend
         self._model = create_model(model_id, config=cfg, backend=backend)
         self._model.load()
+        logger.info("Pipeline ready — %s on %s", model_id, backend.device)
 
     def __call__(
         self,
@@ -112,6 +117,7 @@ class ASRPipeline:
 
     def switch_model(self, model_id: str) -> None:
         """Hot-swap to another registered model."""
+        logger.info("Switching model: %s → %s", self._model.model_id if self._model else "none", model_id)
         if self._model is not None:
             self._model.unload()
         self._init_model(model_id)

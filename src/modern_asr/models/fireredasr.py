@@ -25,7 +25,14 @@ from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 def _check_deps() -> None:
+    logger.info("Checking dependencies for %s", __name__)
+
     from modern_asr.utils.auto_install import ensure_pypi
 
     ensure_pypi("torch>=2.0")
@@ -66,6 +73,8 @@ class _FireRedASRBase(ASRModel):
         return snapshot_download(hf_path)
 
     def load(self) -> None:
+        logger.info("Loading %s", self.model_id)
+
         _check_deps()
         from fireredasr.models.fireredasr import FireRedAsr
 
@@ -78,6 +87,8 @@ class _FireRedASRBase(ASRModel):
         self._is_loaded = True
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:
+        logger.info("Transcribing with %s", self.model_id)
+
         self._ensure_loaded()
 
         # FireRedASR-AED max input length is ~60s; LLM is ~30s.

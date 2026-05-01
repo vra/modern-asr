@@ -63,13 +63,19 @@ class _SenseVoiceBase(ASRModel):
         return defaults.get(self.config.model_id, f"iic/{self.config.model_id}")
 
     def load(self) -> None:
+        from modern_asr.utils.log import get_logger
+
+        logger = get_logger(__name__)
+        logger.info("Loading %s", self.model_id)
+
         _check_deps()
         from funasr import AutoModel
 
+        device = self._resolve_device()
         self._model = AutoModel(
             model=self._model_path,
             trust_remote_code=True,
-            device=self._resolve_device(),
+            device=device,
             disable_update=True,
         )
         # Workaround: torchaudio 2.x kaldi.fbank outputs 81-dim (with energy)
@@ -77,6 +83,7 @@ class _SenseVoiceBase(ASRModel):
         # model's expected 560-dim. We patch the frontend to crop to 560.
         self._patch_frontend_output()
         self._is_loaded = True
+        logger.info("%s ready on %s", self.model_id, device)
 
     def _patch_frontend_output(self) -> None:
         """Patch frontend to fix torchaudio 2.x kaldi.fbank 81-dim output.

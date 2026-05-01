@@ -18,6 +18,11 @@ from modern_asr.core.config import BackendConfig, ModelConfig
 from modern_asr.core.registry import register_model
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 @register_model("glm-asr-nano-2512")
 class GLMASRNano2512(AudioLLMModel):
     """GLM-ASR-Nano-2512: 1.5B open-source ASR from Zhipu AI."""
@@ -45,6 +50,8 @@ class GLMASRNano2512(AudioLLMModel):
 
     def load(self) -> None:
         """Load with error handling for missing transformers support."""
+        logger.info("Loading %s", self.model_id)
+
         try:
             super().load()
         except (ValueError, ImportError) as exc:

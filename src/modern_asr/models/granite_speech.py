@@ -24,7 +24,14 @@ from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 def _check_deps() -> None:
+    logger.info("Checking dependencies for %s", __name__)
+
     from modern_asr.utils.auto_install import ensure_pypi
 
     ensure_pypi("torch>=2.0")
@@ -60,6 +67,8 @@ class GraniteSpeech33_8B(ASRModel):
         return "granite-speech-3.3-8b"
 
     def load(self) -> None:
+        logger.info("Loading %s", self.model_id)
+
         _check_deps()
         from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
         import torch
@@ -82,6 +91,8 @@ class GraniteSpeech33_8B(ASRModel):
         self._is_loaded = True
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:
+        logger.info("Transcribing with %s", self.model_id)
+
         self._ensure_loaded()
         import torch
 

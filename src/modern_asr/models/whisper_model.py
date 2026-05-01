@@ -21,7 +21,14 @@ from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult, AudioInput, Segment, WordTimestamp
 
 
+
+from modern_asr.utils.log import get_logger
+
+logger = get_logger(__name__)
+
 def _check_deps() -> None:
+    logger.info("Checking dependencies for %s", __name__)
+
     from modern_asr.utils.auto_install import ensure_pypi
 
     ensure_pypi("torch>=2.0")
@@ -65,6 +72,8 @@ class WhisperLargeV3(ASRModel):
         return self.config.model_id
 
     def load(self) -> None:
+        logger.info("Loading %s", self.model_id)
+
         _check_deps()
         import whisper
 
@@ -72,6 +81,8 @@ class WhisperLargeV3(ASRModel):
         self._is_loaded = True
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:
+        logger.info("Transcribing with %s", self.model_id)
+
         self._ensure_loaded()
         waveform = self._to_waveform(audio)
 
