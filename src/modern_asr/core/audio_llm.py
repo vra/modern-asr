@@ -30,6 +30,7 @@ Example::
 from __future__ import annotations
 
 import importlib
+import os
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -128,6 +129,10 @@ class AudioLLMModel(ASRModel):
         device = self._resolve_device()
         dtype = self._resolve_dtype()
 
+        hf_endpoint = os.environ.get("HF_ENDPOINT")
+        if hf_endpoint:
+            logger.info("Using HF endpoint: %s", hf_endpoint)
+
         processor_cls = self._import_cls(self.PROCESSOR_CLS)
         model_cls = self._import_cls(self.MODEL_CLS)
 
@@ -141,8 +146,12 @@ class AudioLLMModel(ASRModel):
             "low_cpu_mem_usage": self.LOW_CPU_MEM_USAGE,
         }
         if dtype is not None:
+            load_kwargs["torch_dtype"] = dtype
             load_kwargs["dtype"] = dtype
         if device != "cpu":
+            from modern_asr.utils.auto_install import ensure_pypi
+
+            ensure_pypi("accelerate>=0.25.0")
             load_kwargs["device_map"] = device
         else:
             load_kwargs["device_map"] = None

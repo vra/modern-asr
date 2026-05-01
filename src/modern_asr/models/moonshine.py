@@ -32,6 +32,7 @@ def _check_deps() -> None:
     from modern_asr.utils.auto_install import ensure_pypi
 
     ensure_pypi("onnxruntime>=1.17.0")
+    ensure_pypi("moonshine>=0.1.0", "moonshine")
 
 
 @register_model("moonshine-tiny")
@@ -41,7 +42,7 @@ class MoonshineTiny(ASRModel):
     MODEL_CARD = "https://huggingface.co/UsefulSensors/moonshine"
     SUPPORTED_LANGUAGES = {"en", "auto"}
     SUPPORTED_MODES = {"transcribe"}
-    REQUIREMENTS = ["onnxruntime"]
+    REQUIREMENTS = ["onnxruntime", "moonshine"]
 
     def __init__(
         self,
@@ -64,16 +65,9 @@ class MoonshineTiny(ASRModel):
         logger.info("Loading %s", self.model_id)
 
         _check_deps()
-        try:
-            import moonshine  # type: ignore[import-untyped]
-            self._model = moonshine
-        except ImportError:
-            # Fallback to direct ONNX if moonshine package not available
-            from modern_asr.backends.onnx_backend import ONNXBackend
-            self._backend_impl = ONNXBackend(device="cpu")
-            # Moonshine exports encoder/decoder as separate ONNX files
-            self._backend_impl.load(self._model_path)
-            self._model = None
+        import moonshine  # type: ignore[import-untyped]
+
+        self._model = moonshine
         self._is_loaded = True
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:
@@ -81,12 +75,7 @@ class MoonshineTiny(ASRModel):
 
         self._ensure_loaded()
         waveform = self._to_waveform(audio)
-
-        if hasattr(self, "_model") and self._model is not None and hasattr(self._model, "transcribe"):
-            text = self._model.transcribe(waveform)  # type: ignore[union-attr]
-        else:
-            # ONNX fallback placeholder
-            text = ""
+        text = self._model.transcribe(waveform)  # type: ignore[union-attr]
 
         return ASRResult(
             text=text.strip() if isinstance(text, str) else "",

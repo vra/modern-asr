@@ -14,6 +14,7 @@ src/modern_asr/
 ├── cli.py                   # CLI: modern-asr list / transcribe
 ├── core/
 │   ├── base.py              # ASRModel abstract base class
+│   ├── audio_llm.py         # AudioLLMModel reusable base for audio-encoder + LLM-decoder
 │   ├── types.py             # AudioInput, ASRResult, Segment, WordTimestamp
 │   ├── config.py            # ModelConfig, BackendConfig, PipelineConfig (Pydantic)
 │   ├── registry.py          # @register_model decorator, create_model(), list_models()
@@ -39,7 +40,9 @@ src/modern_asr/
 │   ├── moonshine.py         # Useful Sensors
 │   └── llama_omni.py        # LLaMA-Omni
 └── utils/
-    └── audio.py             # load_audio(), chunk_audio()
+    ├── audio.py             # load_audio(), chunk_audio()
+    ├── auto_install.py      # Auto-install deps, git repos, and HF weights on first use
+    └── log.py               # Unified RichHandler logging with ISO timestamps
 ```
 
 ## Adding a New Model

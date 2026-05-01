@@ -1,73 +1,100 @@
 # Modern ASR
 
-A **unified, extensible, and future-proof** Python toolkit for locally running state-of-the-art LLM-based Automatic Speech Recognition (ASR) models.
+<p align="center">
+  <strong>A unified, extensible, future-proof toolkit for locally running state-of-the-art LLM-based ASR models.</strong>
+</p>
 
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="Apache 2.0"></a>
+  <a href="https://pypi.org/project/modern-asr/"><img src="https://img.shields.io/pypi/v/modern-asr" alt="PyPI"></a>
+</p>
+
+<p align="center">
+  <a href="README_zh.md">简体中文</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#supported-models">Models</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#architecture">Architecture</a>
+</p>
 
 ---
 
 ## ✨ Features
 
-- 🧩 **23 Models** — Whisper, SenseVoice, Qwen, MiMo, FireRedASR, GLM-ASR, and more
-- 🔌 **Plugin Architecture** — Add new models with `@register_model` decorator
-- 🚀 **Hot-Swap** — Switch models at runtime without restarting
-- 🌍 **Multi-Language** — 52 languages, 22 Chinese dialects
-- 🎯 **Multi-Task** — Transcription, translation, diarization, emotion, events
-- 💻 **Local-First** — All inference on-device. No APIs. No data leaves your machine.
-- 🍎 **Apple Silicon** — MPS (Metal Performance Shaders) support on macOS
-- 🐍 **Modern Python** — uv-native packaging, Pydantic configs, rich CLI
+- **🧩 19 Models** — Whisper, SenseVoice, Qwen, MiMo, FireRedASR, GLM-ASR, and more.
+- **🔌 Zero-Config Plugin** — Add new models via `@register_model` decorator.
+- **🚀 Runtime Hot-Swap** — Switch models without restarting the process.
+- **🌍 Multi-Language** — 52 languages, 22 Chinese dialects.
+- **🎯 Multi-Task** — Transcription, translation, diarization, emotion, events.
+- **💻 Local-First** — All inference on-device. No API keys. No data leaves your machine.
+- **🍎 Apple Silicon** — Native MPS (Metal Performance Shaders) support.
+- **📦 Auto-Install** — Dependencies, git repos, and HF weights are installed automatically on first use.
+- **🐍 Modern Python** — Pydantic configs, rich CLI, ISO-timestamped logging.
 
 ---
 
 ## 📦 Installation
 
-### From PyPI (Recommended)
-
 ```bash
 pip install modern-asr
 ```
 
-**模型依赖和权重会在第一次使用时自动安装** — 你只需要输入模型名字，其余全自动化：
+Dependencies and model weights are **installed automatically** the first time you use a model — just type its name:
 
 ```python
 from modern_asr import ASRPipeline
 
-# SenseVoice — 自动安装 funasr、modelscope，自动下载权重
 pipe = ASRPipeline("sensevoice-small")
-
-# MiMo-ASR — 自动 clone 官方仓库，自动下载 HF 权重
 pipe = ASRPipeline("mimo-asr-v2.5")
-
-# Whisper — 自动安装 openai-whisper，自动下载权重
 pipe = ASRPipeline("whisper-small")
 ```
 
-如果需要预装所有依赖（离线环境）：
+For offline/air-gapped environments, pre-install everything:
+
 ```bash
 pip install modern-asr[all-models]
 ```
 
 **Available extras:** `transformers`, `vllm`, `onnx`, `firered-asr`, `sensevoice`, `fun-asr`, `qwen-asr`, `mimo-asr`, `canary-qwen`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
 
-### From Source
+**Requirements:** Python ≥ 3.10.
+
+---
+
+## 🧩 Supported Models
+
+| Series | Model ID | Params | Languages | Extra |
+|--------|----------|--------|-----------|-------|
+| **Whisper** (OpenAI) | `whisper-tiny` | 39M | 99+ | `whisper` |
+| | `whisper-base` | 74M | 99+ | `whisper` |
+| | `whisper-small` | 244M | 99+ | `whisper` |
+| | `whisper-medium` | 769M | 99+ | `whisper` |
+| | `whisper-large-v3` | 1.5B | 99+ | `whisper` |
+| | `whisper-large-v3-turbo` | 809M | 99+ | `whisper` |
+| **SenseVoice** (Alibaba) | `sensevoice-small` | 234M | zh/en/ja/ko/yue | `sensevoice` |
+| | `sensevoice-large` | — | 50+ | `sensevoice` |
+| **Qwen3-ASR** (Alibaba) | `qwen3-asr-0.6b` | 0.6B | 22 dialects | `qwen-asr` |
+| | `qwen3-asr-1.7b` | 1.7B | 22 dialects | `qwen-asr` |
+| **Qwen2.5-Omni** (Alibaba) | `qwen2.5-omni-7b` | 7B | zh/en | `qwen-asr` |
+| **FunASR / Paraformer** (Alibaba) | `funasr-nano` | 0.8B | zh/en | `fun-asr` |
+| | `paraformer-zh` | 0.2B | zh | `fun-asr` |
+| | `paraformer-large` | 0.7B | zh | `fun-asr` |
+| **FireRedASR** (Xiaohongshu) | `fireredasr-aed` | 1.1B | zh | `firered-asr` |
+| | `fireredasr-llm` | 8.3B | zh | `firered-asr` |
+| **MiMo-ASR** (Xiaomi) | `mimo-asr-v2.5` | 8B | zh/dialects | `mimo-asr` |
+| **MiDasheng** (Xiaomi) | `midashenglm-7b` | 7B | audio understanding | `mimo-asr` |
+| **Canary-Qwen** (NVIDIA) | `canary-qwen-2.5b` | 2.5B | en/de/fr/es | `canary-qwen` |
+| **GLM-ASR** (Zhipu AI) | `glm-asr-nano-2512` | 1.5B | zh/en/yue | `glm-asr` |
+| **Granite Speech** (IBM) | `granite-speech-3.3-8b` | 8B | en | `transformers` |
+| **Moonshine** (Useful Sensors) | `moonshine-tiny` | 27M | en | `moonshine` |
+| **LLaMA-Omni** | `llama-omni-8b` | 8B | zh/en | `transformers` |
 
 ```bash
-# Clone the repository
-git clone https://github.com/vra/modern-asr.git
-cd modern-asr
-
-# Sync dependencies (recommended)
-uv sync --all-extras
-
-# Or install specific extras only
-uv sync --extra transformers --extra whisper
-
-# Or just core dependencies
-uv sync
+# List all available models
+python -m modern_asr list
 ```
-
-**Python 3.10+ recommended.** Some models (Qwen3-ASR, MiMo) require Python ≥ 3.10.
 
 ---
 
@@ -76,12 +103,12 @@ uv sync
 ```python
 from modern_asr import ASRPipeline
 
-# Transcribe with SenseVoice (Alibaba)
+# Chinese with SenseVoice
 pipe = ASRPipeline("sensevoice-small")
 result = pipe("audio.wav", language="zh")
 print(result.text)
 
-# Switch to Qwen3-ASR for dialect support
+# Switch to Qwen3-ASR for dialects
 pipe.switch_model("qwen3-asr-0.6b")
 result = pipe("audio.wav", language="zh")
 print(result.text)
@@ -89,16 +116,7 @@ print(result.text)
 # English with Whisper
 pipe.switch_model("whisper-small")
 result = pipe("audio.wav", language="en")
-```
-
----
-
-## 📚 Documentation
-
-Full documentation with Material for MkDocs:
-
-```bash
-mkdocs serve
+print(result.text)
 ```
 
 ---
@@ -107,8 +125,8 @@ mkdocs serve
 
 Modern ASR is built on three layers:
 
-1. **ASRPipeline** — Unified user API. Handles input normalization, task dispatch, model lifecycle.
-2. **ASRModel / AudioLLMModel** — Adapter layer. New models often need only **8 lines of config** via `AudioLLMModel`.
+1. **ASRPipeline** — Unified user API. Input normalization, task dispatch, model lifecycle.
+2. **ASRModel / AudioLLMModel** — Adapter layer. New models often need only **8 lines of config**.
 3. **Backends** — Transformers, vLLM, ONNX Runtime.
 
 ### Adding a New Model
@@ -128,7 +146,17 @@ class MyModel1B(AudioLLMModel):
         return "my-model-1b"
 ```
 
-That's it. The registry auto-discovers it at runtime.
+The registry auto-discovers it at runtime. That's it.
+
+---
+
+## 📚 Documentation
+
+Full documentation with Material for MkDocs:
+
+```bash
+mkdocs serve
+```
 
 ---
 
@@ -141,3 +169,5 @@ See [Contributing Guide](docs/contributing.md) for development setup, code style
 ## 📄 License
 
 Apache-2.0
+
+---

@@ -9,7 +9,7 @@ import numpy as np
 
 from modern_asr.core.base import ASRModel
 from modern_asr.core.config import BackendConfig, ModelConfig, PipelineConfig
-from modern_asr.core.registry import create_model, get_model_class
+from modern_asr.core.registry import create_model
 from modern_asr.core.types import ASRResult, AudioInput
 from modern_asr.utils.audio import load_audio
 from modern_asr.utils.log import get_logger

@@ -15,7 +15,7 @@ from modern_asr.core.types import (
 # Trigger auto-discovery and registration of all built-in model adapters
 import modern_asr.models as _models_module  # noqa: F401
 
-__version__ = "0.1.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "ASRModel",

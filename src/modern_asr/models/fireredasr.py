@@ -14,7 +14,6 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -141,19 +140,6 @@ class _FireRedASRBase(ASRModel):
             sf.write(tmp, chunk, sr, subtype="PCM_16")
             paths.append(tmp)
         return paths
-
-    def _to_wav_path(self, audio: AudioInput) -> str:
-        if audio.is_file():
-            path = str(audio.data)
-            # FireRedASR requires 16kHz 16-bit PCM WAV
-            if path.lower().endswith(".wav"):
-                return path
-        # Convert to temp WAV
-        arr = self._to_waveform(audio)
-        tmp_path = tempfile.mktemp(suffix=".wav")
-        import soundfile as sf
-        sf.write(tmp_path, arr, audio.sample_rate, subtype="PCM_16")
-        return tmp_path
 
     def _to_waveform(self, audio: AudioInput) -> np.ndarray:
         if audio.is_array():

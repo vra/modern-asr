@@ -41,6 +41,8 @@ def _load_with_best_backend(
     mono: bool,
 ) -> tuple[np.ndarray, int]:
     """Attempt loading with available libraries."""
+    errors: list[str] = []
+
     # Prefer torchaudio
     try:
         import torchaudio
@@ -52,16 +54,16 @@ def _load_with_best_backend(
             waveform = resampler(waveform.unsqueeze(0)).squeeze(0)
             sr = target_sr
         return waveform.numpy(), sr
-    except Exception:
-        pass
+    except Exception as exc:
+        errors.append(f"torchaudio: {exc}")
 
     # Fallback to librosa
     try:
         import librosa
         arr, sr = librosa.load(path, sr=target_sr, mono=mono)
         return arr, sr
-    except Exception:
-        pass
+    except Exception as exc:
+        errors.append(f"librosa: {exc}")
 
     # Fallback to soundfile
     try:
@@ -70,30 +72,39 @@ def _load_with_best_backend(
         if mono and arr.ndim > 1:
             arr = arr.mean(axis=1)
         if sr != target_sr:
-            # Simple linear interpolation resampling (not ideal but works)
             arr = _resample_simple(arr, sr, target_sr)
             sr = target_sr
         return arr, sr
-    except Exception:
-        pass
+    except Exception as exc:
+        errors.append(f"soundfile: {exc}")
 
-    # Last resort: built-in wave
-    import wave
-    import struct
-    with wave.open(path, "rb") as w:
-        sr = w.getframerate()
-        n_channels = w.getnchannels()
-        n_frames = w.getnframes()
-        raw = w.readframes(n_frames)
-        fmt = f"{n_frames * n_channels}h"
-        samples = struct.unpack(fmt, raw)
-        arr = np.array(samples, dtype=np.float32) / 32768.0
-        if n_channels > 1 and mono:
-            arr = arr.reshape(-1, n_channels).mean(axis=1)
-        if sr != target_sr:
-            arr = _resample_simple(arr, sr, target_sr)
-            sr = target_sr
-        return arr, sr
+    # Last resort: built-in wave (only for standard RIFF WAV)
+    try:
+        import wave
+        import struct
+        with wave.open(path, "rb") as w:
+            sr = w.getframerate()
+            n_channels = w.getnchannels()
+            n_frames = w.getnframes()
+            raw = w.readframes(n_frames)
+            fmt = f"{n_frames * n_channels}h"
+            samples = struct.unpack(fmt, raw)
+            arr = np.array(samples, dtype=np.float32) / 32768.0
+            if n_channels > 1 and mono:
+                arr = arr.reshape(-1, n_channels).mean(axis=1)
+            if sr != target_sr:
+                arr = _resample_simple(arr, sr, target_sr)
+                sr = target_sr
+            return arr, sr
+    except Exception as exc:
+        errors.append(f"wave: {exc}")
+
+    raise RuntimeError(
+        f"Failed to load audio '{path}'. "
+        f"All backends failed:\n  - " + "\n  - ".join(errors) + "\n"
+        f"If this is a non-WAV file, install torchaudio/librosa: "
+        f"pip install torchaudio librosa"
+    )
 
 
 def _resample_simple(arr: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:

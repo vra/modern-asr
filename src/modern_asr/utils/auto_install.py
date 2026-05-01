@@ -78,9 +78,16 @@ def ensure_hf(repo_id: str, name: str | None = None) -> Path:
     dest = _CACHE_ROOT / "models" / name
     if not dest.exists() or not any(dest.iterdir()):
         dest.parent.mkdir(parents=True, exist_ok=True)
-        logger.info("Auto-downloading %s ...", repo_id)
+        endpoint = os.environ.get("HF_ENDPOINT")
+        if endpoint:
+            logger.info("Auto-downloading %s via %s ...", repo_id, endpoint)
+        else:
+            logger.info("Auto-downloading %s ...", repo_id)
         token = os.environ.get("HF_TOKEN")
-        kwargs: dict[str, object] = {"local_dir": str(dest)}
+        kwargs: dict[str, object] = {
+            "local_dir": str(dest),
+            "resume_download": True,
+        }
         if token:
             kwargs["token"] = token
         snapshot_download(repo_id, **kwargs)

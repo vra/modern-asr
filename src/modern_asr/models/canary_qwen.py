@@ -40,7 +40,7 @@ def _check_deps() -> None:
 class CanaryQwen25B(ASRModel):
     """Canary-Qwen 2.5B: #1 on HuggingFace Open ASR Leaderboard, 5.63% WER average."""
 
-    MODEL_CARD = "https://huggingface.co/nvidia/canary-1b"
+    MODEL_CARD = "https://huggingface.co/nvidia/canary-qwen-2.5b"
     SUPPORTED_LANGUAGES = {"en", "de", "fr", "es", "auto", "multi"}
     SUPPORTED_MODES = {"transcribe", "translate"}
     REQUIREMENTS = ["nemo-toolkit[asr]", "torch"]

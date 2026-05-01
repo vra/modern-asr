@@ -39,6 +39,8 @@ uv sync --extra whisper
 ### SenseVoice & Paraformer (Alibaba)
 ```bash
 uv sync --extra sensevoice
+# or Fun-ASR only
+uv sync --extra fun-asr
 ```
 
 ### FireRedASR (Xiaohongshu)
@@ -84,37 +86,19 @@ uv sync --all-extras
 
 ## Manual Dependencies for Special Cases
 
-### Qwen3-ASR (GitHub-only package)
+Modern ASR automatically installs missing dependencies, clones git repos, and
+downloads HuggingFace weights on first use. You only need manual steps if you
+are in an **offline/air-gapped environment**.
 
-The `qwen-asr` package is not yet on PyPI. Install from GitHub:
-
-```bash
-pip install git+https://github.com/QwenLM/Qwen3-ASR.git
-```
-
-### MiMo-V2.5-ASR (Clone official repo)
-
-MiMo requires the official repository code for its audio tokenizer:
+### Pre-download everything (offline use)
 
 ```bash
-git clone https://github.com/XiaomiMiMo/MiMo-V2.5-ASR.git
-cd MiMo-V2.5-ASR
-pip install -r requirements.txt
+# Install all extras upfront
+pip install modern-asr[all-models]
 
-# Download weights
-huggingface-cli download XiaomiMiMo/MiMo-V2.5-ASR \
-    --local-dir models/MiMo-V2.5-ASR
-huggingface-cli download XiaomiMiMo/MiMo-Audio-Tokenizer \
-    --local-dir models/MiMo-Audio-Tokenizer
-```
-
-### FireRedASR (Clone official repo)
-
-FireRedASR also requires its official repository:
-
-```bash
-git clone https://github.com/FireRedTeam/FireRedASR.git /tmp/FireRedASR
-cd /tmp/FireRedASR && pip install -e .
+# Pre-download model weights (optional, for faster first run)
+huggingface-cli download zai-org/GLM-ASR-Nano-2512
+huggingface-cli download XiaomiMiMo/MiMo-V2.5-ASR
 ```
 
 ---
