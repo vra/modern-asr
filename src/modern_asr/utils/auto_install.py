@@ -16,7 +16,9 @@ from modern_asr.utils.log import get_logger
 
 logger = get_logger(__name__)
 
-_CACHE_ROOT = Path.home() / ".cache" / "modern-asr"
+_CACHE_ROOT = Path(
+    os.environ.get("MODERN_ASR_CACHE_DIR", Path.home() / ".cache" / "modern-asr")
+)
 
 
 def _run(cmd: list[str]) -> None:

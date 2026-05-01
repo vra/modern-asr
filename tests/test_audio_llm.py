@@ -135,7 +135,7 @@ class TestLoad:
             m.load()
 
         call_kwargs = mock_model_cls.from_pretrained.call_args[1]
-        assert call_kwargs["torch_dtype"] == torch.float32
+        assert call_kwargs["dtype"] == torch.float32
 
 
 # ------------------------------------------------------------------ #

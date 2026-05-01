@@ -48,7 +48,7 @@ pipe = ASRPipeline("whisper-small")
 pip install modern-asr[all-models]
 ```
 
-**Available extras:** `transformers`, `vllm`, `onnx`, `fireredasr`, `sensevoice`, `funasr`, `qwen-asr`, `mimo-asr`, `canary`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
+**Available extras:** `transformers`, `vllm`, `onnx`, `firered-asr`, `sensevoice`, `fun-asr`, `qwen-asr`, `mimo-asr`, `canary-qwen`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
 
 ### From Source
 

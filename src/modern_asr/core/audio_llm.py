@@ -141,7 +141,7 @@ class AudioLLMModel(ASRModel):
             "low_cpu_mem_usage": self.LOW_CPU_MEM_USAGE,
         }
         if dtype is not None:
-            load_kwargs["torch_dtype"] = dtype
+            load_kwargs["dtype"] = dtype
         if device != "cpu":
             load_kwargs["device_map"] = device
         else:

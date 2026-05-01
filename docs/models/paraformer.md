@@ -16,7 +16,7 @@ Paraformer is Alibaba DAMO Academy's mature streaming ASR model, widely deployed
 ## Installation
 
 ```bash
-uv sync --extra funasr
+uv sync --extra fun-asr
 ```
 
 Or manually:

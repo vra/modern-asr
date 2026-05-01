@@ -43,7 +43,7 @@ uv sync --extra sensevoice
 
 ### FireRedASR (Xiaohongshu)
 ```bash
-uv sync --extra fireredasr
+uv sync --extra firered-asr
 ```
 
 ### Qwen3-ASR (Alibaba)
@@ -63,7 +63,7 @@ uv sync --extra glm-asr
 
 ### Canary-Qwen (NVIDIA)
 ```bash
-uv sync --extra canary
+uv sync --extra canary-qwen
 ```
 
 ### Moonshine (Useful Sensors)

@@ -15,7 +15,7 @@ Fun-ASR-Nano is Alibaba Tongyi Lab's lightweight Audio-LLM ASR model (0.8B param
 ## Installation
 
 ```bash
-uv sync --extra funasr
+uv sync --extra fun-asr
 ```
 
 Or manually:

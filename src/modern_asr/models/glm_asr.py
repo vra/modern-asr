@@ -34,7 +34,7 @@ class GLMASRNano2512(AudioLLMModel):
 
     HF_PATH = "zai-org/GLM-ASR-Nano-2512"
     PROCESSOR_CLS = "transformers.AutoTokenizer"
-    MODEL_CLS = "transformers.AutoModelForSpeechSeq2Seq"
+    MODEL_CLS = "transformers.AutoModel"
     DEFAULT_MAX_NEW_TOKENS = 256
 
     def __init__(

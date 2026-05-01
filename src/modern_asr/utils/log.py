@@ -31,10 +31,11 @@ def get_logger(name: str) -> logging.Logger:
         handler = RichHandler(
             rich_tracebacks=True,
             show_path=True,
+            show_time=False,
             console=Console(stderr=True),
         )
         formatter = logging.Formatter(
-            "%(asctime)s │ %(name)s │ %(message)s",
+            "%(asctime)s │ %(name)s:%(lineno)d │ %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
         handler.setFormatter(formatter)

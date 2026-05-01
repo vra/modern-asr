@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modern-asr"
-version = "0.1.6"
+version = "0.2.0"
 description = "A unified, extensible, and modern Python toolkit for LLM-based Automatic Speech Recognition (ASR)."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -57,7 +57,7 @@ onnx = [
 ]
 
 # Model-specific dependencies (optional, user picks what they need)
-fireredasr = [
+firered-asr = [
     "torch>=2.0",
     "torchaudio>=2.0",
     "transformers>=4.40.0",
@@ -74,7 +74,7 @@ sensevoice = [
     "funasr>=1.1.0",
     "modelscope>=1.15.0",
 ]
-funasr = [
+fun-asr = [
     "torch>=2.0",
     "torchaudio>=2.0",
     "funasr>=1.1.0",
@@ -91,7 +91,7 @@ mimo-asr = [
     "torchaudio>=2.0",
     "transformers>=4.40.0",
 ]
-canary = [
+canary-qwen = [
     # "nemo-toolkit[asr]>=2.0",
     "torch>=2.0",
 ]
@@ -112,7 +112,7 @@ moonshine = [
 
 # Convenience bundles
 all-models = [
-    "modern-asr[fireredasr,sensevoice,funasr,qwen-asr,mimo-asr,canary,glm-asr,whisper,moonshine]",
+    "modern-asr[firered-asr,sensevoice,fun-asr,qwen-asr,mimo-asr,canary-qwen,glm-asr,whisper,moonshine]",
 ]
 all-backends = [
     "modern-asr[transformers,vllm,onnx]",
