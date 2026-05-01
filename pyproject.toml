@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modern-asr"
-version = "0.1.0"
+version = "0.1.1"
 description = "A unified, extensible, and modern Python toolkit for LLM-based Automatic Speech Recognition (ASR)."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -83,7 +83,7 @@ qwen-asr = [
     "torch>=2.0,<2.5",
     "torchaudio>=2.0,<2.5",
     "transformers>=4.40.0",
-    "qwen-asr @ git+https://github.com/QwenLM/Qwen3-ASR.git",
+    "qwen-asr>=0.0.6",
 ]
 mimo-asr = [
     "torch>=2.0,<2.5",
@@ -139,15 +139,27 @@ masr = "modern_asr.cli:main"
 modern-asr = "modern_asr.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/your-org/modern-asr"
-Repository = "https://github.com/your-org/modern-asr"
-Issues = "https://github.com/your-org/modern-asr/issues"
+Homepage = "https://github.com/vra/modern-asr"
+Repository = "https://github.com/vra/modern-asr"
+Issues = "https://github.com/vra/modern-asr/issues"
 
 [tool.uv]
 default-groups = ["dev"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.venv",
+    "/.venv312",
+    "/.pytest_cache",
+    "/.github",
+    "/tests",
+    "/docs",
+    "/examples",
+    "/.git",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/modern_asr"]

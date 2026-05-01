@@ -21,6 +21,28 @@ A **unified, extensible, and future-proof** Python toolkit for locally running s
 
 ## 📦 Installation
 
+### From PyPI (Recommended)
+
+```bash
+# Core only — registry, pipeline, and CLI (no models)
+pip install modern-asr
+
+# Specific model
+pip install modern-asr[whisper]
+pip install modern-asr[qwen-asr]
+pip install modern-asr[sensevoice]
+
+# All models
+pip install modern-asr[all-models]
+
+# All models + all inference backends
+pip install modern-asr[all]
+```
+
+**Available extras:** `transformers`, `vllm`, `onnx`, `fireredasr`, `sensevoice`, `funasr`, `qwen-asr`, `mimo-asr`, `canary`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
+
+### From Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/vra/modern-asr.git
