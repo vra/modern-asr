@@ -27,14 +27,10 @@ from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
 def _check_deps() -> None:
-    try:
-        import torch  # noqa: F401
-        import transformers  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "MiDashengLM requires 'torch' and 'transformers'. "
-            "Install with: uv sync --extra mimo-asr"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("transformers>=4.40.0")
 
 
 @register_model("midashenglm-7b")

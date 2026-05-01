@@ -24,14 +24,10 @@ from modern_asr.core.types import ASRResult
 
 
 def _check_deps() -> None:
-    try:
-        import qwen_asr  # noqa: F401
-        import torch  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "Qwen3-ASR requires 'qwen-asr' and 'torch'. "
-            "Install with: pip install git+https://github.com/QwenLM/Qwen3-ASR.git"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("qwen-asr>=0.0.6", "qwen_asr")
 
 
 class _QwenASRBase(AudioLLMModel):

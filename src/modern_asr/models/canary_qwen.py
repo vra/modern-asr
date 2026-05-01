@@ -24,14 +24,9 @@ from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
 def _check_deps() -> None:
-    try:
-        import nemo  # noqa: F401
-        import nemo.collections.asr  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "Canary-Qwen requires NVIDIA NeMo. "
-            "Install with: uv sync --extra canary"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("nemo-toolkit[asr]", "nemo")
 
 
 @register_model("canary-qwen-2.5b")

@@ -59,14 +59,10 @@ from modern_asr.core.types import ASRResult
 
 
 def _check_deps() -> None:
-    try:
-        import torch  # noqa: F401
-        import transformers  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "MiMo-ASR requires 'torch' and 'transformers'. "
-            "Install with: uv sync --extra mimo-asr"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("transformers>=4.40.0")
 
 
 @register_model("mimo-asr-v2.5")
@@ -149,45 +145,22 @@ class MiMoASRV25(AudioLLMModel):
     def load(self) -> None:
         _check_deps()
 
-        repo_root = self._find_repo_root()
-        if repo_root and repo_root not in sys.path:
-            sys.path.insert(0, repo_root)
+        from modern_asr.utils.auto_install import ensure_git, ensure_hf
 
-        try:
-            from src.mimo_audio.mimo_audio import MimoAudio
-        except ImportError as exc:
-            raise RuntimeError(
-                f"MiMo-V2.5-ASR requires the official repository cloned locally.\n"
-                f"Please run:\n"
-                f"  git clone {self._REPO_URL}\n"
-                f"  cd MiMo-V2.5-ASR && pip install -r requirements.txt\n"
-                f"Then provide model_path='./MiMo-V2.5-ASR/models/MiMo-V2.5-ASR' "
-                f"when creating the pipeline.\n"
-                f"Original error: {exc}"
-            ) from exc
+        # 1. Auto-clone the official repo if missing
+        repo_root = ensure_git(self._REPO_URL, "MiMo-V2.5-ASR")
+        if str(repo_root) not in sys.path:
+            sys.path.insert(0, str(repo_root))
 
-        if not os.path.isdir(self._model_dir):
-            raise RuntimeError(
-                f"MiMo model directory not found: {self._model_dir}. "
-                f"Download weights with:\n"
-                f"  huggingface-cli download XiaomiMiMo/MiMo-V2.5-ASR "
-                f"    --local-dir {self._model_dir}"
-            )
-        if not os.path.isdir(self._tokenizer_dir):
-            raise RuntimeError(
-                f"MiMo tokenizer directory not found: {self._tokenizer_dir}. "
-                f"Download with:\n"
-                f"  huggingface-cli download XiaomiMiMo/MiMo-Audio-Tokenizer "
-                f"    --local-dir {self._tokenizer_dir}"
-            )
+        # 2. Auto-download HF weights if missing
+        model_dir = ensure_hf("XiaomiMiMo/MiMo-V2.5-ASR", "mimo-v2.5-asr")
+        tokenizer_dir = ensure_hf(
+            "XiaomiMiMo/MiMo-Audio-Tokenizer", "mimo-audio-tokenizer"
+        )
 
-        try:
-            self._model = MimoAudio(self._model_dir, self._tokenizer_dir)
-        except Exception as exc:
-            raise RuntimeError(
-                f"Failed to initialise MiMoAudio with model={self._model_dir} "
-                f"and tokenizer={self._tokenizer_dir}. Original error: {exc}"
-            ) from exc
+        from src.mimo_audio.mimo_audio import MimoAudio
+
+        self._model = MimoAudio(str(model_dir), str(tokenizer_dir))
         self._is_loaded = True
 
     # ------------------------------------------------------------------ #

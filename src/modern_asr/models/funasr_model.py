@@ -32,14 +32,12 @@ from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
 def _check_deps() -> None:
-    try:
-        import torch  # noqa: F401
-        import funasr  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "Fun-ASR requires 'torch' and 'funasr'. "
-            "Install with: uv sync --extra funasr"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("torchaudio>=2.0")
+    ensure_pypi("funasr>=1.1.0")
+    ensure_pypi("modelscope>=1.15.0")
 
 
 def _patch_funasr_nano() -> None:

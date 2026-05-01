@@ -26,15 +26,14 @@ from modern_asr.core.types import ASRResult, AudioInput, Segment
 
 
 def _check_deps() -> None:
-    try:
-        import torch  # noqa: F401
-        import transformers  # noqa: F401
-        import fireredasr  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "FireRedASR requires the official FireRedASR package. "
-            "Install with: pip install git+https://github.com/FireRedTeam/FireRedASR.git"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("transformers>=4.40.0")
+    ensure_pypi("sentencepiece>=0.2.0")
+    ensure_pypi(
+        "git+https://github.com/FireRedTeam/FireRedASR.git", "fireredasr"
+    )
 
 
 class _FireRedASRBase(ASRModel):

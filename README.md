@@ -25,22 +25,28 @@ A **unified, extensible, and future-proof** Python toolkit for locally running s
 ### From PyPI (Recommended)
 
 ```bash
-# Core only — registry, pipeline, and CLI (no models)
 pip install modern-asr
-
-# Specific model
-pip install modern-asr[whisper]
-pip install modern-asr[qwen-asr]
-pip install modern-asr[sensevoice]
-
-# All models
-pip install modern-asr[all-models]
-
-# All models + all inference backends
-pip install modern-asr[all]
 ```
 
-**Available extras:** `transformers`, `vllm`, `onnx`, `fireredasr`, `sensevoice`, `funasr`, `qwen-asr`, `mimo-asr`, `canary`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
+**模型依赖和权重会在第一次使用时自动安装** — 你只需要输入模型名字，其余全自动化：
+
+```python
+from modern_asr import ASRPipeline
+
+# SenseVoice — 自动安装 funasr、modelscope，自动下载权重
+pipe = ASRPipeline("sensevoice-small")
+
+# MiMo-ASR — 自动 clone 官方仓库，自动下载 HF 权重
+pipe = ASRPipeline("mimo-asr-v2.5")
+
+# Whisper — 自动安装 openai-whisper，自动下载权重
+pipe = ASRPipeline("whisper-small")
+```
+
+如果需要预装所有依赖（离线环境）：
+```bash
+pip install modern-asr[all-models]
+```
 
 ### From Source
 

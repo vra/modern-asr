@@ -22,14 +22,10 @@ from modern_asr.core.types import ASRResult, AudioInput, Segment, WordTimestamp
 
 
 def _check_deps() -> None:
-    try:
-        import whisper  # noqa: F401
-        import torch  # noqa: F401
-    except ImportError as exc:
-        raise ImportError(
-            "Whisper requires 'openai-whisper' and 'torch'. "
-            "Install with: uv sync --extra whisper"
-        ) from exc
+    from modern_asr.utils.auto_install import ensure_pypi
+
+    ensure_pypi("torch>=2.0")
+    ensure_pypi("openai-whisper>=20231117", "whisper")
 
 
 @register_model("whisper-large-v3")

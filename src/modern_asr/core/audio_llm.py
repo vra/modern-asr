@@ -107,10 +107,19 @@ class AudioLLMModel(ASRModel):
             return str(self.config.model_path)
         return self.HF_PATH
 
+    def _auto_install_requirements(self) -> None:
+        """Auto-install missing packages declared in ``REQUIREMENTS``."""
+        from modern_asr.utils.auto_install import ensure_pypi
+
+        for spec in getattr(self, "REQUIREMENTS", []):
+            if spec:
+                ensure_pypi(spec)
+
     # --- Loading --------------------------------------------------------
 
     def load(self) -> None:
         """Load processor and model using the configured class paths."""
+        self._auto_install_requirements()
         device = self._resolve_device()
         dtype = self._resolve_dtype()
 
