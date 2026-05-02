@@ -156,7 +156,15 @@ class SubprocessIsolatedMixin:
         if worker:
             worker_script = worker if os.path.isabs(worker) else str(project_root / worker)
         else:
-            worker_script = str(project_root / "scripts" / "subprocess_worker.py")
+            # Try package-internal path first (pip-installed wheel)
+            try:
+                from importlib.resources import files
+
+                pkg_path = files("modern_asr.backends") / "subprocess_worker.py"
+                worker_script = str(pkg_path)
+            except Exception:
+                # Fallback to project-root scripts/ (editable install)
+                worker_script = str(project_root / "scripts" / "subprocess_worker.py")
 
         if not os.path.isfile(worker_script):
             raise RuntimeError(f"Worker script not found: {worker_script}")
