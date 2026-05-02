@@ -76,7 +76,17 @@ def ensure_hf(repo_id: str, name: str | None = None) -> Path:
     if name is None:
         name = repo_id.replace("/", "--")
     dest = _CACHE_ROOT / "models" / name
-    if not dest.exists() or not any(dest.iterdir()):
+
+    def _has_weights(path: Path) -> bool:
+        if not path.exists():
+            return False
+        return any(
+            f.suffix in (".safetensors", ".bin", ".pt", ".pth")
+            for f in path.iterdir()
+            if f.is_file()
+        )
+
+    if not _has_weights(dest):
         dest.parent.mkdir(parents=True, exist_ok=True)
         endpoint = os.environ.get("HF_ENDPOINT")
         if endpoint:
@@ -86,7 +96,6 @@ def ensure_hf(repo_id: str, name: str | None = None) -> Path:
         token = os.environ.get("HF_TOKEN")
         kwargs: dict[str, object] = {
             "local_dir": str(dest),
-            "resume_download": True,
         }
         if token:
             kwargs["token"] = token

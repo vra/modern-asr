@@ -44,7 +44,7 @@ def _check_deps() -> None:
 class MiDashengLM7B(ASRModel):
     """MiDashengLM-7B: Xiaomi's unified audio understanding model."""
 
-    MODEL_CARD = "https://huggingface.co/Xiaomi/MiDashengLM-7B"
+    MODEL_CARD = "https://huggingface.co/mispeech/midashenglm-7b-1021-fp32"
     SUPPORTED_LANGUAGES = {"zh", "en", "auto", "multi"}
     SUPPORTED_MODES = {"transcribe", "multi_task"}
     REQUIREMENTS = ["torch", "transformers"]
@@ -60,7 +60,8 @@ class MiDashengLM7B(ASRModel):
     def _resolve_hf_path(self) -> str:
         if self.config.model_path:
             return str(self.config.model_path)
-        return "Xiaomi/MiDashengLM-7B"
+        # Upstream model is hosted under the mispeech org rather than Xiaomi
+        return "mispeech/midashenglm-7b-1021-fp32"
 
     @property
     def model_id(self) -> str:
@@ -70,7 +71,7 @@ class MiDashengLM7B(ASRModel):
         logger.info("Loading %s", self.model_id)
 
         _check_deps()
-        from transformers import AutoModel, AutoProcessor
+        from transformers import AutoModelForCausalLM, AutoProcessor
         import torch
 
         backend = self.backend or BackendConfig()
@@ -81,13 +82,24 @@ class MiDashengLM7B(ASRModel):
             self._hf_path,
             trust_remote_code=True,
         )
-        self._model = AutoModel.from_pretrained(
-            self._hf_path,
-            torch_dtype=torch_dtype,
-            device_map=device if device != "auto" else "auto",
-            trust_remote_code=True,
-            low_cpu_mem_usage=True,
-        )
+        try:
+            self._model = AutoModelForCausalLM.from_pretrained(
+                self._hf_path,
+                torch_dtype=torch_dtype,
+                device_map=device if device != "auto" else "auto",
+                trust_remote_code=True,
+                low_cpu_mem_usage=True,
+            )
+        except RuntimeError as exc:
+            if "meta" in str(exc):
+                raise RuntimeError(
+                    f"{self.model_id} failed to load due to a device compatibility issue "
+                    "between the model's custom code and the installed PyTorch/transformers "
+                    "version. This typically occurs when custom model initialization creates "
+                    "tensors on CPU while transformers expects the meta device. "
+                    f"Original error: {exc}"
+                ) from exc
+            raise
         self._is_loaded = True
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:

@@ -57,7 +57,7 @@ For offline/air-gapped environments, pre-install everything:
 pip install modern-asr[all-models]
 ```
 
-**Available extras:** `transformers`, `vllm`, `onnx`, `firered-asr`, `sensevoice`, `fun-asr`, `qwen-asr`, `mimo-asr`, `canary-qwen`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
+**Available extras:** `transformers`, `vllm`, `onnx`, `firered-asr`, `sensevoice`, `fun-asr`, `qwen-asr`, `mimo-asr`, `glm-asr`, `whisper`, `moonshine`, `all-models`, `all-backends`, `all`.
 
 **Requirements:** Python ≥ 3.10.
 
@@ -74,10 +74,10 @@ pip install modern-asr[all-models]
 | | `whisper-large-v3` | 1.5B | 99+ | `whisper` |
 | | `whisper-large-v3-turbo` | 809M | 99+ | `whisper` |
 | **SenseVoice** (Alibaba) | `sensevoice-small` | 234M | zh/en/ja/ko/yue | `sensevoice` |
-| | `sensevoice-large` | — | 50+ | `sensevoice` |
+
 | **Qwen3-ASR** (Alibaba) | `qwen3-asr-0.6b` | 0.6B | 22 dialects | `qwen-asr` |
 | | `qwen3-asr-1.7b` | 1.7B | 22 dialects | `qwen-asr` |
-| **Qwen2.5-Omni** (Alibaba) | `qwen2.5-omni-7b` | 7B | zh/en | `qwen-asr` |
+
 | **FunASR / Paraformer** (Alibaba) | `funasr-nano` | 0.8B | zh/en | `fun-asr` |
 | | `paraformer-zh` | 0.2B | zh | `fun-asr` |
 | | `paraformer-large` | 0.7B | zh | `fun-asr` |
@@ -85,11 +85,11 @@ pip install modern-asr[all-models]
 | | `fireredasr-llm` | 8.3B | zh | `firered-asr` |
 | **MiMo-ASR** (Xiaomi) | `mimo-asr-v2.5` | 8B | zh/dialects | `mimo-asr` |
 | **MiDasheng** (Xiaomi) | `midashenglm-7b` | 7B | audio understanding | `mimo-asr` |
-| **Canary-Qwen** (NVIDIA) | `canary-qwen-2.5b` | 2.5B | en/de/fr/es | `canary-qwen` |
+
 | **GLM-ASR** (Zhipu AI) | `glm-asr-nano-2512` | 1.5B | zh/en/yue | `glm-asr` |
 | **Granite Speech** (IBM) | `granite-speech-3.3-8b` | 8B | en | `transformers` |
 | **Moonshine** (Useful Sensors) | `moonshine-tiny` | 27M | en | `moonshine` |
-| **LLaMA-Omni** | `llama-omni-8b` | 8B | zh/en | `transformers` |
+
 
 ```bash
 # List all available models

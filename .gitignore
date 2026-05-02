@@ -59,3 +59,6 @@ site/
 test_all_models.py
 test_final.py
 test_final_results.json
+
+# Model-specific isolated venvs
+.venv_*/

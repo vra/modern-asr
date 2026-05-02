@@ -11,6 +11,7 @@ References:
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 import numpy as np
@@ -20,19 +21,17 @@ from modern_asr.core.config import BackendConfig, ModelConfig
 from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult, AudioInput, Segment
 
-
-
 from modern_asr.utils.log import get_logger
 
 logger = get_logger(__name__)
+
 
 def _check_deps() -> None:
     logger.info("Checking dependencies for %s", __name__)
 
     from modern_asr.utils.auto_install import ensure_pypi
 
-    ensure_pypi("onnxruntime>=1.17.0")
-    ensure_pypi("moonshine>=0.1.0", "moonshine")
+    ensure_pypi("useful-moonshine", "moonshine")
 
 
 @register_model("moonshine-tiny")
@@ -42,7 +41,7 @@ class MoonshineTiny(ASRModel):
     MODEL_CARD = "https://huggingface.co/UsefulSensors/moonshine"
     SUPPORTED_LANGUAGES = {"en", "auto"}
     SUPPORTED_MODES = {"transcribe"}
-    REQUIREMENTS = ["onnxruntime", "moonshine"]
+    REQUIREMENTS = ["useful-moonshine"]
 
     def __init__(
         self,
@@ -55,7 +54,7 @@ class MoonshineTiny(ASRModel):
     def _resolve_model_path(self) -> str:
         if self.config.model_path:
             return str(self.config.model_path)
-        return "UsefulSensors/moonshine-tiny"
+        return "moonshine/tiny"
 
     @property
     def model_id(self) -> str:
@@ -65,6 +64,7 @@ class MoonshineTiny(ASRModel):
         logger.info("Loading %s", self.model_id)
 
         _check_deps()
+        os.environ.setdefault("KERAS_BACKEND", "torch")
         import moonshine  # type: ignore[import-untyped]
 
         self._model = moonshine
@@ -74,8 +74,9 @@ class MoonshineTiny(ASRModel):
         logger.info("Transcribing with %s", self.model_id)
 
         self._ensure_loaded()
-        waveform = self._to_waveform(audio)
-        text = self._model.transcribe(waveform)  # type: ignore[union-attr]
+        audio_path = self._resolve_audio_path(audio)
+        texts = self._model.transcribe(audio_path, self._model_path)
+        text = texts[0] if isinstance(texts, list) else str(texts)
 
         return ASRResult(
             text=text.strip() if isinstance(text, str) else "",
@@ -84,11 +85,13 @@ class MoonshineTiny(ASRModel):
             model_id=self.model_id,
         )
 
-    def _to_waveform(self, audio: AudioInput) -> np.ndarray:
-        if audio.is_array():
-            arr = audio.data
-            if isinstance(arr, np.ndarray):
-                return arr
-        from modern_asr.utils.audio import load_audio
-        loaded = load_audio(str(audio.data), target_sr=16000)
-        return loaded.data  # type: ignore[return-value]
+    def _resolve_audio_path(self, audio: AudioInput) -> str:
+        if audio.is_file():
+            return str(audio.data)
+        # Moonshine expects a file path, so write temporary wav
+        import tempfile
+        import soundfile as sf
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            arr = audio.data if audio.is_array() else audio.data
+            sf.write(f.name, arr, 16000)
+            return f.name

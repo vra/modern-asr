@@ -3,7 +3,7 @@
 from modern_asr.core.base import ASRModel
 from modern_asr.core.config import ModelConfig, BackendConfig
 from modern_asr.core.pipeline import ASRPipeline
-from modern_asr.core.registry import register_model, list_models
+from modern_asr.core.registry import create_model, list_models, register_model
 from modern_asr.core.types import (
     ASRResult,
     AudioInput,
@@ -23,6 +23,7 @@ __all__ = [
     "ASRResult",
     "AudioInput",
     "BackendConfig",
+    "create_model",
     "Language",
     "ModelConfig",
 

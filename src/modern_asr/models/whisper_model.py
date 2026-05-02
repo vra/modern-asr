@@ -86,8 +86,11 @@ class WhisperLargeV3(ASRModel):
         self._ensure_loaded()
         waveform = self._to_waveform(audio)
 
+        lang = kwargs.get("language", self.config.language or None)
+        if lang in ("auto", "multi"):
+            lang = None
         options = {
-            "language": kwargs.get("language", self.config.language or None),
+            "language": lang,
             "task": kwargs.get("task", "transcribe"),
             "temperature": kwargs.get("temperature", self.config.temperature or 0.0),
             "word_timestamps": kwargs.get(

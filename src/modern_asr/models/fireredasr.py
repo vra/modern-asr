@@ -23,23 +23,96 @@ from modern_asr.core.config import BackendConfig, ModelConfig
 from modern_asr.core.registry import register_model
 from modern_asr.core.types import ASRResult, AudioInput, Segment
 
-
-
 from modern_asr.utils.log import get_logger
 
 logger = get_logger(__name__)
 
+
 def _check_deps() -> None:
     logger.info("Checking dependencies for %s", __name__)
 
-    from modern_asr.utils.auto_install import ensure_pypi
+    from modern_asr.utils.auto_install import ensure_pypi, ensure_git
 
     ensure_pypi("torch>=2.0")
     ensure_pypi("transformers>=4.40.0")
     ensure_pypi("sentencepiece>=0.2.0")
-    ensure_pypi(
-        "git+https://github.com/FireRedTeam/FireRedASR.git", "fireredasr"
+    repo = ensure_git("https://github.com/FireRedTeam/FireRedASR.git", "fireredasr")
+    # Add repo root to PYTHONPATH so `import fireredasr` works
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+
+    # Patch torch.load for PyTorch 2.6+ weights_only default
+    _patch_fireredasr_torch_load(str(repo))
+    # Patch tokenizer for transformers 5.x BatchEncoding compatibility
+    _patch_fireredasr_tokenizer(str(repo))
+
+
+def _patch_fireredasr_torch_load(repo_root: str) -> None:
+    """Patch torch.load calls in the cloned FireRedASR repo for PyTorch 2.6+."""
+    import pathlib, re
+
+    models_dir = pathlib.Path(repo_root) / "fireredasr" / "models"
+    if not models_dir.exists():
+        return
+
+    for py_file in models_dir.glob("*.py"):
+        src = py_file.read_text(encoding="utf-8")
+        if "weights_only" in src:
+            continue  # Already patched
+        # Add weights_only=False to torch.load calls that don't have it
+        new_src = re.sub(
+            r"torch\.load\(([^)]+)\)",
+            r"torch.load(\1, weights_only=False)",
+            src,
+        )
+        if new_src != src:
+            py_file.write_text(new_src, encoding="utf-8")
+
+
+def _patch_fireredasr_tokenizer(repo_root: str) -> None:
+    """Patch LlmTokenizerWrapper for transformers 5.x compatibility.
+
+    In transformers 5.x, ``tokenizer.apply_chat_template(..., tokenize=True)``
+    may return a ``BatchEncoding`` or ``torch.Tensor`` instead of a plain
+    ``list``.  This causes ``torch.tensor(texts, dtype=torch.int)`` to fail
+    with ``ValueError: too many dimensions 'str'``.
+    """
+    import pathlib
+
+    target = (
+        pathlib.Path(repo_root)
+        / "fireredasr"
+        / "tokenizer"
+        / "llm_tokenizer.py"
     )
+    if not target.exists():
+        return
+
+    src = target.read_text(encoding="utf-8")
+    if "# PATCH: transformers 5.x tokenize v2" in src:
+        return  # Already patched
+
+    old_block = '''            if not isinstance(encoded, list):
+                # PATCH: transformers 5.x tokenize=True returns BatchEncoding or Tensor
+                if hasattr(encoded, "tolist"):
+                    encoded = encoded.tolist()
+                else:
+                    encoded = list(encoded)
+            texts.append(encoded)'''
+
+    new_block = '''            if not isinstance(encoded, list):
+                # PATCH: transformers 5.x tokenize v2
+                if hasattr(encoded, "input_ids"):
+                    encoded = encoded["input_ids"]
+                elif hasattr(encoded, "tolist"):
+                    encoded = encoded.tolist()
+                else:
+                    encoded = list(encoded)
+            texts.append(encoded)'''
+
+    if old_block in src:
+        src = src.replace(old_block, new_block)
+        target.write_text(src, encoding="utf-8")
 
 
 class _FireRedASRBase(ASRModel):
@@ -47,7 +120,7 @@ class _FireRedASRBase(ASRModel):
 
     SUPPORTED_LANGUAGES = {"zh", "en", "yue", "auto"}
     SUPPORTED_MODES = {"transcribe", "translate"}
-    REQUIREMENTS = ["torch", "transformers", "sentencepiece", "fireredasr"]
+    REQUIREMENTS = ["torch", "transformers", "sentencepiece"]
 
     def __init__(
         self,
@@ -55,8 +128,8 @@ class _FireRedASRBase(ASRModel):
         backend: BackendConfig | None = None,
     ) -> None:
         super().__init__(config, backend)
-        self._model_dir = self._resolve_model_dir()
         self._asr_type = "aed" if "aed" in self.model_id else "llm"
+        self._model_dir = self._resolve_model_dir()
 
     def _resolve_model_dir(self) -> str:
         if self.config.model_path:
@@ -67,20 +140,27 @@ class _FireRedASRBase(ASRModel):
             "fireredasr-aed": "fireredteam/FireRedASR-AED-L",
         }
         hf_path = defaults.get(self.config.model_id, f"fireredteam/{self.config.model_id}")
-        # Download via huggingface_hub
-        from huggingface_hub import snapshot_download
-        return snapshot_download(hf_path)
+        from modern_asr.utils.auto_install import ensure_hf
+        model_dir = str(ensure_hf(hf_path))
+
+        # FireRedASR-LLM requires the base Qwen2-7B-Instruct LLM inside the model dir
+        if self._asr_type == "llm":
+            llm_subdir = os.path.join(model_dir, "Qwen2-7B-Instruct")
+            if not os.path.isdir(llm_subdir) or not any(os.listdir(llm_subdir)):
+                logger.info("Auto-downloading base LLM Qwen/Qwen2-7B-Instruct ...")
+                llm_path = ensure_hf("Qwen/Qwen2-7B-Instruct", "qwen2-7b-instruct")
+                # Create a symlink so the FireRedASR code finds it
+                if os.path.islink(llm_subdir) or os.path.exists(llm_subdir):
+                    os.remove(llm_subdir)
+                os.symlink(str(llm_path), llm_subdir)
+
+        return model_dir
 
     def load(self) -> None:
         logger.info("Loading %s", self.model_id)
 
         _check_deps()
         from fireredasr.models.fireredasr import FireRedAsr
-
-        # Ensure fireredasr is on PYTHONPATH so submodules can be imported
-        firered_pkg = sys.modules["fireredasr"].__path__[0]
-        if firered_pkg not in sys.path:
-            sys.path.insert(0, os.path.dirname(firered_pkg))
 
         self._model = FireRedAsr.from_pretrained(self._asr_type, self._model_dir)
         self._is_loaded = True

@@ -2,7 +2,6 @@
 
 Models:
     - glm-asr-nano-2512: 1.5B params, open-source
-    - glm-asr-2512: cloud version
 
 References:
     - https://github.com/zai-org/GLM-ASR
@@ -20,14 +19,24 @@ import numpy as np
 from modern_asr.core.audio_llm import AudioLLMModel
 from modern_asr.core.config import BackendConfig, ModelConfig
 from modern_asr.core.registry import register_model
+from modern_asr.core.subprocess_mixin import SubprocessIsolatedMixin
 from modern_asr.core.types import ASRResult, AudioInput, Segment
 from modern_asr.utils.log import get_logger
 
 logger = get_logger(__name__)
 
 
+def _glm_transformers_supported() -> bool:
+    """Return True if the current transformers has glmasr support."""
+    try:
+        from transformers.models.auto.configuration_auto import CONFIG_MAPPING
+        return "glmasr" in CONFIG_MAPPING
+    except Exception:
+        return False
+
+
 @register_model("glm-asr-nano-2512")
-class GLMASRNano2512(AudioLLMModel):
+class GLMASRNano2512(SubprocessIsolatedMixin, AudioLLMModel):
     """GLM-ASR-Nano-2512: 1.5B open-source ASR from Zhipu AI."""
 
     MODEL_CARD = "https://huggingface.co/zai-org/GLM-ASR-Nano-2512"
@@ -39,6 +48,11 @@ class GLMASRNano2512(AudioLLMModel):
     PROCESSOR_CLS = "transformers.AutoProcessor"
     MODEL_CLS = "transformers.AutoModel"
     DEFAULT_MAX_NEW_TOKENS = 256
+
+    # Subprocess isolation: GLM-ASR requires transformers from source (dev)
+    SUBPROCESS_VENV = ".venv_glm"
+    SUBPROCESS_ENV_VAR = "MODERN_ASR_GLM_VENV"
+    SUBPROCESS_CHECK = staticmethod(lambda: not _glm_transformers_supported())
 
     def __init__(
         self,
@@ -54,20 +68,19 @@ class GLMASRNano2512(AudioLLMModel):
     def load(self) -> None:
         """Load with error handling for missing transformers support."""
         logger.info("Loading %s", self.model_id)
-        try:
-            super().load()
-        except (ValueError, ImportError) as exc:
-            raise RuntimeError(
-                f"GLM-ASR requires a newer version of transformers. "
-                f"Please upgrade: uv sync --extra transformers. "
-                f"Original error: {exc}"
-            ) from exc
+        self._try_native_then_subprocess(native_load=super().load)
 
     def transcribe(self, audio: AudioInput, **kwargs: Any) -> ASRResult:
         """Transcribe audio using GLM-ASR's chat-template input format."""
+        self._ensure_loaded()
+
+        # Use subprocess backend if active
+        if getattr(self, "_subprocess_backend", None) is not None:
+            audio_path = self._resolve_audio_path(audio)
+            return self._subprocess_transcribe(audio_path, **kwargs)
+
         import torch
 
-        self._ensure_loaded()
         lang = kwargs.get("language", self.config.language or "auto")
 
         # Resolve audio to a file path (GLM processor accepts path, not waveform)
@@ -92,7 +105,6 @@ class GLMASRNano2512(AudioLLMModel):
             return_dict=True,
             return_tensors="pt",
         )
-        import torch
 
         model_dtype = next(self._model.parameters()).dtype
         model_inputs = {}

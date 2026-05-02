@@ -2,7 +2,6 @@
 
 Models:
     - sensevoice-small: 234M, non-autoregressive, ultra-fast
-    - sensevoice-large: large variant, 50+ languages
 
 Capabilities:
     - ASR (automatic speech recognition)
@@ -36,9 +35,11 @@ def _check_deps() -> None:
     ensure_pypi("modelscope>=1.15.0")
 
 
-class _SenseVoiceBase(ASRModel):
-    """Shared logic for SenseVoice variants."""
+@register_model("sensevoice-small")
+class SenseVoiceSmall(ASRModel):
+    """SenseVoice-Small: 234M params, 70ms for 10s audio, 5 languages."""
 
+    MODEL_CARD = "https://huggingface.co/iic/SenseVoiceSmall"
     SUPPORTED_LANGUAGES = {
         "zh", "en", "yue", "ja", "ko", "auto", "nospeech", "multi"
     }
@@ -56,11 +57,11 @@ class _SenseVoiceBase(ASRModel):
     def _resolve_model_path(self) -> str:
         if self.config.model_path:
             return str(self.config.model_path)
-        defaults = {
-            "sensevoice-small": "iic/SenseVoiceSmall",
-            "sensevoice-large": "iic/SenseVoiceLarge",
-        }
-        return defaults.get(self.config.model_id, f"iic/{self.config.model_id}")
+        return "iic/SenseVoiceSmall"
+
+    @property
+    def model_id(self) -> str:
+        return "sensevoice-small"
 
     def load(self) -> None:
         from modern_asr.utils.log import get_logger
@@ -193,25 +194,3 @@ class _SenseVoiceBase(ASRModel):
         """Remove SenseVoice special tags like <|zh|><|NEUTRAL|><|Speech|>."""
         import re
         return re.sub(r"<\|[^|]+\|>", "", text).strip()
-
-
-@register_model("sensevoice-small")
-class SenseVoiceSmall(_SenseVoiceBase):
-    """SenseVoice-Small: 234M params, 70ms for 10s audio, 5 languages."""
-
-    MODEL_CARD = "https://huggingface.co/iic/SenseVoiceSmall"
-
-    @property
-    def model_id(self) -> str:
-        return "sensevoice-small"
-
-
-@register_model("sensevoice-large")
-class SenseVoiceLarge(_SenseVoiceBase):
-    """SenseVoice-Large: high-precision, 50+ languages."""
-
-    MODEL_CARD = "https://huggingface.co/iic/SenseVoiceLarge"
-
-    @property
-    def model_id(self) -> str:
-        return "sensevoice-large"

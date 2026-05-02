@@ -65,6 +65,115 @@ def _check_deps() -> None:
     ensure_pypi("transformers>=4.40.0")
 
 
+def _patch_mimo_flash_attn(repo_root: str) -> None:
+    """Make flash_attn optional in the MiMo repo by injecting a PyTorch fallback."""
+    import pathlib
+
+    target = pathlib.Path(repo_root) / "src" / "mimo_audio_tokenizer" / "modeling_audio_tokenizer.py"
+    if not target.exists():
+        return
+
+    src = target.read_text(encoding="utf-8")
+    if "flash_attn_optional" in src:
+        return  # Already patched
+
+    # Replace the unconditional import with a try/except + fallback
+    old_import = "from flash_attn import flash_attn_varlen_func"
+    new_import = '''try:
+    from flash_attn import flash_attn_varlen_func
+except ImportError:
+    import torch.nn.functional as _F
+    def flash_attn_varlen_func(q, k, v, cu_seqlens_q, cu_seqlens_k, max_seqlen_q, max_seqlen_k, causal=False, window_size=(-1, -1), **kwargs):
+        """PyTorch fallback for flash_attn_varlen_func."""
+        batch_size = len(cu_seqlens_q) - 1
+        outputs = []
+        for i in range(batch_size):
+            qi = q[cu_seqlens_q[i]:cu_seqlens_q[i+1]].unsqueeze(0).transpose(1, 2)
+            ki = k[cu_seqlens_k[i]:cu_seqlens_k[i+1]].unsqueeze(0).transpose(1, 2)
+            vi = v[cu_seqlens_k[i]:cu_seqlens_k[i+1]].unsqueeze(0).transpose(1, 2)
+            out = _F.scaled_dot_product_attention(qi, ki, vi, is_causal=causal)
+            out = out.transpose(1, 2).squeeze(0)
+            outputs.append(out)
+        return torch.cat(outputs, dim=0)
+    # mark as patched
+    flash_attn_varlen_func._flash_attn_optional = True  # type: ignore[attr-defined]
+'''
+
+    if old_import in src:
+        src = src.replace(old_import, new_import)
+        target.write_text(src, encoding="utf-8")
+
+
+def _patch_mimo_rotary_embedding(repo_root: str) -> None:
+    """Patch MiMo's RotaryEmbedding for transformers 5.7.0 compatibility.
+
+    transformers 5.7.0's ``_init_weights`` expects ``compute_default_rope_parameters``
+    on every ``RotaryEmbedding`` with ``rope_type == 'default'``.  MiMo's custom
+    ``RotaryEmbedding`` lacks this method and a ``config`` attribute, so
+    ``from_pretrained`` crashes after weight loading.
+
+    We inject the missing method and a minimal ``config`` property into the
+    class by rewriting the source file.
+    """
+    import pathlib
+
+    target = pathlib.Path(repo_root) / "src" / "mimo_audio_tokenizer" / "modeling_audio_tokenizer.py"
+    if not target.exists():
+        return
+
+    src = target.read_text(encoding="utf-8")
+    if "# PATCH: transformers 5.7.0 rotary embedding" in src:
+        return  # Already patched
+
+    # 1. Store base/dim in __init__ so compute_default_rope_parameters can use them
+    old_init = """        self.max_seq_len = max_seq_len
+        self.rope_type = rope_type
+
+        self.rope_init_fn = ROPE_INIT_FUNCTIONS[self.rope_type]
+
+        inv_freq, self.attention_scaling = self.rope_init_fn(
+            device=device, base=base, dim=dim
+        )"""
+
+    new_init = """        self.max_seq_len = max_seq_len
+        self.rope_type = rope_type
+        self.base = base
+        self.dim = dim
+
+        self.rope_init_fn = ROPE_INIT_FUNCTIONS[self.rope_type]
+
+        inv_freq, self.attention_scaling = self.rope_init_fn(
+            device=device, base=base, dim=dim
+        )"""
+
+    if old_init in src:
+        src = src.replace(old_init, new_init)
+
+    # 2. Insert compute_default_rope_parameters and config property before forward()
+    old_forward = "    @torch.no_grad()\n    @dynamic_rope_update\n    def forward(self, x, position_ids):"
+
+    new_methods = '''    # PATCH: transformers 5.7.0 rotary embedding
+    @property
+    def config(self):
+        """Dummy config for transformers 5.7.0 _init_weights compatibility."""
+        class _DummyConfig:
+            rope_parameters = {"rope_theta": getattr(self, "base", 10000.0)}
+        return _DummyConfig()
+
+    def compute_default_rope_parameters(self, config=None, device=None, seq_len=None):
+        """Return already-computed inv_freq (transformers 5.7.0 expects this)."""
+        return self.inv_freq, self.attention_scaling
+
+    @torch.no_grad()
+    @dynamic_rope_update
+    def forward(self, x, position_ids):'''
+
+    if old_forward in src:
+        src = src.replace(old_forward, new_methods)
+
+    target.write_text(src, encoding="utf-8")
+
+
 @register_model("mimo-asr-v2.5")
 class MiMoASRV25(AudioLLMModel):
     """MiMo-V2.5-ASR: Xiaomi's open-source ASR for complex real-world scenarios."""
@@ -157,6 +266,31 @@ class MiMoASRV25(AudioLLMModel):
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
 
+        # 1b. Patch flash_attn dependency to optional fallback
+        _patch_mimo_flash_attn(str(repo_root))
+
+        # 1c. Patch RotaryEmbedding for transformers 5.7.0 compatibility
+        _patch_mimo_rotary_embedding(str(repo_root))
+
+        # 1d. Patch GenerationMixin for transformers 5.7.0 compatibility
+        # In transformers >=5.x, PreTrainedModel no longer inherits from
+        # GenerationMixin. MiMoAudioForCausalLM must explicitly mix it in.
+        import transformers.generation.utils as _gen_utils
+        from src.mimo_audio.modeling_mimo_audio import MiMoAudioForCausalLM
+        if not issubclass(MiMoAudioForCausalLM, _gen_utils.GenerationMixin):
+            MiMoAudioForCausalLM.__bases__ = MiMoAudioForCausalLM.__bases__ + (_gen_utils.GenerationMixin,)
+
+        # 1e. Patch GenerationMixin._has_unfinished_sequences for backward compat
+        # MiMo's custom generate() passes cur_len/max_length kwargs that were
+        # removed in transformers 5.7.0.
+        _orig_has_unfinished = _gen_utils.GenerationMixin._has_unfinished_sequences
+        def _patched_has_unfinished(self, this_peer_finished, synced_gpus, device, **kwargs):
+            return _orig_has_unfinished(self, this_peer_finished, synced_gpus, device)
+        _gen_utils.GenerationMixin._has_unfinished_sequences = _patched_has_unfinished
+
+        # 1f. Add missing attributes expected by MiMo's prepare_inputs_for_generation
+        MiMoAudioForCausalLM._supports_cache_class = False  # type: ignore[attr-defined]
+
         # 2. Auto-download HF weights if missing
         model_dir = ensure_hf("XiaomiMiMo/MiMo-V2.5-ASR", "mimo-v2.5-asr")
         tokenizer_dir = ensure_hf(
@@ -165,9 +299,10 @@ class MiMoASRV25(AudioLLMModel):
 
         from src.mimo_audio.mimo_audio import MimoAudio
 
-        self._model = MimoAudio(str(model_dir), str(tokenizer_dir))
+        device = self._resolve_device()
+        self._model = MimoAudio(str(model_dir), str(tokenizer_dir), device=device)
         self._is_loaded = True
-        logger.info("%s ready", self.model_id)
+        logger.info("%s ready on %s", self.model_id, device)
 
     # ------------------------------------------------------------------ #
     # Inference

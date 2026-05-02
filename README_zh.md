@@ -37,7 +37,7 @@ pipe = ASRPipeline("whisper-small")
 pip install modern-asr[all-models]
 ```
 
-**可用 extras：** `transformers`、`vllm`、`onnx`、`firered-asr`、`sensevoice`、`fun-asr`、`qwen-asr`、`mimo-asr`、`canary-qwen`、`glm-asr`、`whisper`、`moonshine`、`all-models`、`all-backends`、`all`
+**可用 extras：** `transformers`、`vllm`、`onnx`、`firered-asr`、`sensevoice`、`fun-asr`、`qwen-asr`、`mimo-asr`、`glm-asr`、`whisper`、`moonshine`、`all-models`、`all-backends`、`all`
 
 **要求：** Python ≥ 3.10
 
@@ -52,10 +52,10 @@ pip install modern-asr[all-models]
 | | `whisper-large-v3` | 1.5B | 99+ | `whisper` |
 | | `whisper-large-v3-turbo` | 809M | 99+ | `whisper` |
 | **SenseVoice** (阿里) | `sensevoice-small` | 234M | 中英日韩粤 | `sensevoice` |
-| | `sensevoice-large` | — | 50+ | `sensevoice` |
+
 | **Qwen3-ASR** (阿里) | `qwen3-asr-0.6b` | 0.6B | 22 种方言 | `qwen-asr` |
 | | `qwen3-asr-1.7b` | 1.7B | 22 种方言 | `qwen-asr` |
-| **Qwen2.5-Omni** (阿里) | `qwen2.5-omni-7b` | 7B | 中英 | `qwen-asr` |
+
 | **FunASR / Paraformer** (阿里) | `funasr-nano` | 0.8B | 中英 | `fun-asr` |
 | | `paraformer-zh` | 0.2B | 中文 | `fun-asr` |
 | | `paraformer-large` | 0.7B | 中文 | `fun-asr` |
@@ -63,11 +63,11 @@ pip install modern-asr[all-models]
 | | `fireredasr-llm` | 8.3B | 中文 | `firered-asr` |
 | **MiMo-ASR** (小米) | `mimo-asr-v2.5` | 8B | 中文/方言 | `mimo-asr` |
 | **MiDasheng** (小米) | `midashenglm-7b` | 7B | 音频理解 | `mimo-asr` |
-| **Canary-Qwen** (NVIDIA) | `canary-qwen-2.5b` | 2.5B | 英德法西 | `canary-qwen` |
+
 | **GLM-ASR** (智谱 AI) | `glm-asr-nano-2512` | 1.5B | 中英粤 | `glm-asr` |
 | **Granite Speech** (IBM) | `granite-speech-3.3-8b` | 8B | 英文 | `transformers` |
 | **Moonshine** (Useful Sensors) | `moonshine-tiny` | 27M | 英文 | `moonshine` |
-| **LLaMA-Omni** | `llama-omni-8b` | 8B | 中英 | `transformers` |
+
 
 ```bash
 # 列出所有可用模型

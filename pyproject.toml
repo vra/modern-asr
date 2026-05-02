@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modern-asr"
-version = "0.2.9"
+version = "0.2.10"
 description = "A unified, extensible, and modern Python toolkit for LLM-based Automatic Speech Recognition (ASR)."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -15,7 +15,7 @@ authors = [
 keywords = [
     "asr", "speech-recognition", "llm", "audio", "whisper",
     "fireredasr", "sensevoice", "qwen-asr", "mimo-asr",
-    "canary-qwen", "glm-asr", "moonshine", "funasr",
+    "glm-asr", "moonshine", "funasr",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -84,7 +84,7 @@ fun-asr = [
 qwen-asr = [
     "torch>=2.0",
     "torchaudio>=2.0",
-    "transformers>=4.40.0",
+    "transformers==4.57.6",
     "qwen-asr>=0.0.6",
     "soundfile>=0.12.0",
 ]
@@ -93,10 +93,6 @@ mimo-asr = [
     "torchaudio>=2.0",
     "transformers>=4.40.0",
     "soundfile>=0.12.0",
-]
-canary-qwen = [
-    "nemo-toolkit[asr]>=2.0",
-    "torch>=2.0",
 ]
 glm-asr = [
     "torch>=2.0",
@@ -111,13 +107,12 @@ whisper = [
 ]
 moonshine = [
     "torch>=2.0",
-    "onnxruntime>=1.17.0",
-    "moonshine>=0.1.0",
+    "useful-moonshine",
 ]
 
 # Convenience bundles
 all-models = [
-    "modern-asr[firered-asr,sensevoice,fun-asr,qwen-asr,mimo-asr,canary-qwen,glm-asr,whisper,moonshine]",
+    "modern-asr[firered-asr,sensevoice,fun-asr,qwen-asr,mimo-asr,glm-asr,whisper,moonshine]",
 ]
 all-backends = [
     "modern-asr[transformers,vllm,onnx]",

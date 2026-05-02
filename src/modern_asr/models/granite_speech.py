@@ -97,12 +97,29 @@ class GraniteSpeech33_8B(ASRModel):
         import torch
 
         waveform = self._to_waveform(audio)
+        # Granite audio_processor expects a torch tensor
+        if not isinstance(waveform, torch.Tensor):
+            waveform = torch.from_numpy(waveform)
+        if waveform.ndim == 1:
+            waveform = waveform.unsqueeze(0)
+
+        tokenizer = self._processor.tokenizer  # type: ignore[union-attr]
+
+        # Granite Speech expects a chat-formatted prompt with an <|audio|> placeholder
+        user_prompt = "<|audio|>can you transcribe the speech into a written format?"
+        chat = [{"role": "user", "content": user_prompt}]
+        prompt = tokenizer.apply_chat_template(
+            chat, tokenize=False, add_generation_prompt=True
+        )
+
+        device = str(self._model.device)
         inputs = self._processor(
-            waveform,
-            sampling_rate=audio.sample_rate,
+            text=prompt,
+            audio=waveform,
+            device=device,
             return_tensors="pt",
         )
-        inputs = {k: v.to(self._model.device) for k, v in inputs.items()}  # type: ignore[union-attr]
+        inputs = {k: v.to(self._model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
 
         gen_kwargs = {
             "max_new_tokens": kwargs.get("max_new_tokens", self.config.max_new_tokens or 256),
@@ -112,7 +129,10 @@ class GraniteSpeech33_8B(ASRModel):
         with torch.no_grad():
             generated_ids = self._model.generate(**inputs, **gen_kwargs)  # type: ignore[union-attr]
 
-        text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0]  # type: ignore[union-attr]
+        # Exclude input prompt tokens from the decoded output
+        num_input_tokens = inputs["input_ids"].shape[-1]
+        new_tokens = generated_ids[:, num_input_tokens:]
+        text = tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
         return ASRResult(
             text=text.strip(),
             segments=[Segment(text=text.strip())],
